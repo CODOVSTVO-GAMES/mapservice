@@ -127,6 +127,7 @@ export class AppService {
             const building = await this.createNewBase(dataDTO.accountId, dataDTO.zoneId)
             chunk = building.chunk
         }
+        if (dataDTO.chunk == undefined || dataDTO.chunk == "undefined") { console.log('Пришла пустота') }
 
         return await this.findChunkByZoneIdAndChunc(dataDTO.zoneId, chunk)
     }
