@@ -114,7 +114,7 @@ export class AppService {
     async mapGetHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.coordinaes)
+            dataDTO = new DataDTO(data.accountId, data.coordinates)
         } catch (e) {
             throw "parsing data error"
         }
