@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ResponseDTO } from './DTO/ResponseDTO';
 import { DataDTO } from './DTO/DataDTO';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Building } from './Models/Bullding';
 import { Repository } from 'typeorm';
+import { LoggerService } from './logger/logger.service';
+import { RabbitMQService } from './rabbit/rabbit.servicve';
 
 
 @Injectable()
@@ -12,6 +14,12 @@ export class AppService {
     constructor(
         @InjectRepository(Building) private mapRepo: Repository<Building>
     ) { }
+
+    @Inject(LoggerService)
+    private readonly loggerService: LoggerService
+
+    @Inject(RabbitMQService)
+    private readonly rabbitService: RabbitMQService
 
     // async dataSaveResponser(data: any) {
     //     const responseDTO = new ResponseDTO()
@@ -126,6 +134,7 @@ export class AppService {
             console.log('создана новая база')
             const building = await this.createNewBase(dataDTO.accountId, dataDTO.zoneId)
             chunk = building.chunk
+            this.rabbitService.questionerUser({ accountId: dataDTO.accountId, chunk: chunk }, 'change_chunk')
         }
         if (dataDTO.chunk == undefined || dataDTO.chunk == "undefined") { console.log('Пришла пустота') }
 
