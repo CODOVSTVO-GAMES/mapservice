@@ -14,7 +14,7 @@ export class AppController {
 
     @EventPattern('get_map')
     async getHello(data: any): Promise<ResponseDTO> {
-        return await this.appService.dataGetResponser(data)
+        return await this.appService.mapGetResponser(data)
     }
 
 }

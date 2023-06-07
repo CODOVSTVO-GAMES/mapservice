@@ -9,7 +9,7 @@ export class Building {
     zoneId: string
 
     @Column()
-    chunkId: number
+    chunk: string
 
     @Column()
     coords: string
@@ -19,7 +19,4 @@ export class Building {
 
     @Column()
     accountId: string
-
-    @Column({ type: "text" })
-    data: string
 }

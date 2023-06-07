@@ -77,13 +77,13 @@ export class AppService {
 
     //----------------------------------------
 
-    async dataGetResponser(data: any) {
+    async mapGetResponser(data: any): Promise<ResponseDTO> {
         const responseDTO = new ResponseDTO()
         let status = 200
 
         try {
-            const resonseDataDTO = await this.dataGetHandler(data)
-            responseDTO.data = {}
+            const response = await this.mapGetHandler(data)
+            responseDTO.data = response
         }
         catch (e) {
             if (e == 'sessions not found' || e == 'session expired') {
@@ -103,66 +103,31 @@ export class AppService {
         return responseDTO
     }
 
-    async dataGetHandler(data: any) {
+    async mapGetHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zoneId)
+            dataDTO = new DataDTO(data.accountId, data.zoneId, data.chunkId)
         } catch (e) {
             throw "parsing data error"
         }
 
-        return this.dataGetLogic(dataDTO)
+        return await this.mapGetLogic(dataDTO)
     }
 
-    async dataGetLogic(dataDTO: DataDTO) {
-        // let bace = 
+    async mapGetLogic(dataDTO: DataDTO): Promise<Building[]> {
+        //размер карты 512 х 512 = 262144
+        //размер чанка 64 х 64 = 4096
+        //координаты чанков 0:0 7:7
+        //координаты клеток 0:0 63:63
 
-        //получить айди зоны и айди пользователя
-        //пройтись по всем обьектам, узнать есть ли такой юзер
-        //если нет создать нового
-        //если есть вернуть его чанк
+        if (dataDTO.chunk == 'none') {
+            await this.createNewBase(dataDTO.accountId, dataDTO.zoneId)
+        }
 
-
-
-        // const accountId = dataDTO.accountId
-        // const incomingObjects = this.parseDataObjectsGET(dataDTO.dataObjects)
-
-        // const savedObjects = await this.findAllDataObjectsByAccountId(accountId)
-
-        // const responseObjects: DataObjectsDTO[] = []
-
-        // for (let l = 0; l < incomingObjects.length; l++) {
-        //     try {
-        //         const obj = this.getObjectByKey(incomingObjects[l], savedObjects)
-        //         const data = JSON.parse(obj.data)
-        //         responseObjects.push(new DataObjectsDTO(obj.className, data))
-        //     } catch (e) {
-        //         if (e == 'object not found') {
-        //             console.log("Запрошен пустой класс!!!")
-        //             //log
-        //             responseObjects.push(new DataObjectsDTO(incomingObjects[l], {}))
-        //         }
-        //         else {
-        //             throw "ЧТо то тут не так"
-        //         }
-        //     }
-        // }
-        // const resonseDataDTO = new ResonseDataDTO()
-        // resonseDataDTO.objects = responseObjects
-        // return resonseDataDTO
-        return 0
+        return await this.findChunkByZoneIdAndChunc(dataDTO.zoneId, dataDTO.chunk)
     }
 
     //----------------------------------------------------------
-
-    parseDataObjectsGET(objects: object): Array<string> {
-        const dataObjects = []
-        const arr: string[] = Object.values(objects)
-        for (let l = 0; l < arr.length; l++) {
-            dataObjects.push(arr[l])
-        }
-        return dataObjects
-    }
 
     async findBaseByAccountIdAndZoneId(accountId: string, zoneId: string) {
         const base = await this.mapRepo.find({
@@ -172,6 +137,68 @@ export class AppService {
             }
         })
         return base
+    }
+
+    async findChunkByZoneIdAndChunc(zoneId: string, chunk: string): Promise<Building[]> {
+        const base = await this.mapRepo.find({
+            where: {
+                chunk: chunk,
+                zoneId: zoneId
+            }
+        })
+        return base
+    }
+
+    async createNewBase(accountId: string, zoneId: string): Promise<Building> {
+        const chunk = this.generateRandomChunk()
+        const coords = this.generateRandomCoordInChunk()
+        return await this.mapRepo.save(
+            this.mapRepo.create(
+                {
+                    accountId: accountId,
+                    zoneId: zoneId,
+                    type: 'base',
+                    coords: coords,
+                    chunk: chunk
+                }
+            )
+        )
+    }
+
+    async saveBuilding(building: Building): Promise<Building> {
+        return await this.mapRepo.save(building)
+    }
+
+    convertArrayCoordsToString(arr: Array<number>): string {
+        return arr[0] + ',' + arr[1]
+    }
+
+    convertStringToCoordsArray(str: string): Array<number> {
+        const strArr = str.split(',', 2)
+        return [parseInt(strArr[0]), parseInt(strArr[1])]
+    }
+
+    findFreeCoords(arr: Array<Building>): string {
+        const coords = this.generateRandomCoordInChunk()
+
+        for (let l = 0; l < arr.length; l++) {
+            if (arr[l].coords == coords) {
+                return this.findFreeCoords(arr)
+            } else {
+                return coords
+            }
+        }
+        return 'Такого быть не должно, ide ругается'
+    }
+
+    generateRandomCoordInChunk(): string {
+        const coords = [Math.floor(Math.random() * 63), Math.floor(Math.random() * 63)]
+        return this.convertArrayCoordsToString(coords)
+    }
+
+    generateRandomChunk(): string {
+        const coords = [Math.floor(Math.random() * 7), Math.floor(Math.random() * 7)]
+        return this.convertArrayCoordsToString(coords)
     }
 }
 
