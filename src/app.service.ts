@@ -130,8 +130,11 @@ export class AppService {
 
         const coordinates = dataDTO.coordinates
 
+        console.log('1')
         const zoneId = this.parseZone(coordinates)
+        console.log('2')
         let chunk = this.parseCoordinates(coordinates)
+        console.log('3')
 
         if (chunk == 'none') {
             console.log('создана новая база')
@@ -190,10 +193,10 @@ export class AppService {
         return arr[0] + ',' + arr[1]
     }
 
-    convertStringToCoordsArray(str: string): Array<number> {
-        const strArr = str.split(',', 2)
-        return [parseInt(strArr[0]), parseInt(strArr[1])]
-    }
+    // convertStringToCoordsArray(str: string): Array<number> {
+    //     const strArr = str.split(',', 2)
+    //     return [parseInt(strArr[0]), parseInt(strArr[1])]
+    // }
 
     findFreeCoords(arr: Array<Building>): string {
         const coords = this.generateRandomCoordInChunk()
