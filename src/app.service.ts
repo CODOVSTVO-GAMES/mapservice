@@ -148,6 +148,9 @@ export class AppService {
 
     async findBaseByAccountIdAndZoneId(accountId: string, zoneId: string) {
         const base = await this.mapRepo.find({
+            select: {
+                id: false,
+            },
             where: {
                 accountId: accountId,
                 zoneId: zoneId
@@ -158,6 +161,9 @@ export class AppService {
 
     async findChunkByZoneIdAndChunc(zoneId: string, chunk: string): Promise<Building[]> {
         const base = await this.mapRepo.find({
+            select: {
+                id: false,
+            },
             where: {
                 chunk: chunk,
                 zoneId: zoneId
@@ -214,7 +220,7 @@ export class AppService {
     }
 
     generateRandomChunk(): string {
-        const coords = [Math.floor(Math.random() * 7), Math.floor(Math.random() * 7)]
+        const coords = [Math.floor(Math.random() * 1), Math.floor(Math.random() * 1)]//ограничено специально
         return this.convertArrayCoordsToString(coords)
     }
 
