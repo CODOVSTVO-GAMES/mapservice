@@ -120,15 +120,15 @@ export class AppService {
         //координаты чанков 0:0 7:7
         //координаты клеток 0:0 63:63
 
-        console.log(dataDTO.accountId)
-        console.log(dataDTO.chunk)
+        let chunk = dataDTO.chunk
 
         if (dataDTO.chunk == 'none') {
             console.log('создана новая база')
-            await this.createNewBase(dataDTO.accountId, dataDTO.zoneId)
+            const building = await this.createNewBase(dataDTO.accountId, dataDTO.zoneId)
+            chunk = building.chunk
         }
 
-        return await this.findChunkByZoneIdAndChunc(dataDTO.zoneId, dataDTO.chunk)
+        return await this.findChunkByZoneIdAndChunc(dataDTO.zoneId, chunk)
     }
 
     //----------------------------------------------------------
