@@ -12,6 +12,7 @@ export class RabbitMQService {
     ) { }
 
     async questionerUser(data: object, queue: string) {
+        console.log('userservice request send' + data)
         try {
             await this.userClient.send(queue, data).pipe().toPromise()
         } catch (e) {
