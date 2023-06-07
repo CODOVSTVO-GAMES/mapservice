@@ -130,12 +130,8 @@ export class AppService {
 
         const coordinates = dataDTO.coordinates
 
-        console.log('1')
-        console.log(coordinates)
         const zoneId = this.parseZone(coordinates)
-        console.log('2')
         let chunk = this.parseCoordinates(coordinates)
-        console.log('3')
 
         if (chunk == 'none') {
             console.log('создана новая база')
