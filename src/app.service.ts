@@ -120,7 +120,11 @@ export class AppService {
         //координаты чанков 0:0 7:7
         //координаты клеток 0:0 63:63
 
+        console.log(dataDTO.accountId)
+        console.log(dataDTO.chunk)
+
         if (dataDTO.chunk == 'none') {
+            console.log('создана новая база')
             await this.createNewBase(dataDTO.accountId, dataDTO.zoneId)
         }
 
@@ -153,7 +157,7 @@ export class AppService {
         const chunk = this.generateRandomChunk()
         const coords = this.generateRandomCoordInChunk()
         return await this.mapRepo.save(
-            this.mapRepo.create(
+            await this.mapRepo.create(
                 {
                     accountId: accountId,
                     zoneId: zoneId,
@@ -165,9 +169,9 @@ export class AppService {
         )
     }
 
-    async saveBuilding(building: Building): Promise<Building> {
-        return await this.mapRepo.save(building)
-    }
+    // async saveBuilding(building: Building): Promise<Building> {
+    //     return await this.mapRepo.save(building)
+    // }
 
     convertArrayCoordsToString(arr: Array<number>): string {
         return arr[0] + ',' + arr[1]
