@@ -114,7 +114,7 @@ export class AppService {
     async mapGetHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zoneId, data.chunk)
+            dataDTO = new DataDTO(data.accountId, data.coordinaes)
         } catch (e) {
             throw "parsing data error"
         }
@@ -128,17 +128,20 @@ export class AppService {
         //координаты чанков 0:0 7:7
         //координаты клеток 0:0 63:63
 
-        let chunk = dataDTO.chunk
+        const coordinates = dataDTO.coordinates
 
-        if (dataDTO.chunk == 'none') {
+        const zoneId = this.parseZone(coordinates)
+        let chunk = this.parseCoordinates(coordinates)
+
+        if (chunk == 'none') {
             console.log('создана новая база')
-            const building = await this.createNewBase(dataDTO.accountId, dataDTO.zoneId)
+            const building = await this.createNewBase(dataDTO.accountId, zoneId)
             chunk = building.chunk
-            this.rabbitService.questionerUser({ accountId: dataDTO.accountId, chunk: chunk }, 'change_chunk')
+            this.rabbitService.questionerUser({ accountId: dataDTO.accountId, coordinates: zoneId + ':' + chunk }, 'change_chunk')
         }
-        if (dataDTO.chunk == undefined || dataDTO.chunk == "undefined") { console.log('Пришла пустота') }
+        if (chunk == undefined || chunk == "undefined") { console.log('Пришла пустота') }
 
-        return await this.findChunkByZoneIdAndChunc(dataDTO.zoneId, chunk)
+        return await this.findChunkByZoneIdAndChunc(zoneId, chunk)
     }
 
     //----------------------------------------------------------
@@ -213,6 +216,14 @@ export class AppService {
     generateRandomChunk(): string {
         const coords = [Math.floor(Math.random() * 7), Math.floor(Math.random() * 7)]
         return this.convertArrayCoordsToString(coords)
+    }
+
+    parseZone(str: string): string {
+        return str.split(':')[0]
+    }
+
+    parseCoordinates(str: string): string {
+        return str.split(':')[1]
     }
 }
 

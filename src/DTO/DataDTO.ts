@@ -1,10 +1,8 @@
 export class DataDTO {
     accountId: string
-    zoneId: string
-    chunk: string
-    constructor(accountId: string, zoneId: string, chunk: string) {
+    coordinates: string
+    constructor(accountId: string, coordinates: string) {
         this.accountId = accountId
-        this.zoneId = zoneId
-        this.chunk = chunk
+        this.coordinates = coordinates
     }
 }
