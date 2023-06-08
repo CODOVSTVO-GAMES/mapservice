@@ -80,16 +80,13 @@ export class AppService {
         let coords: Vector2
 
         if (dataDTO.x == 0 && dataDTO.y == 0) {
-            console.log('1w')
             base = await this.getBase(dataDTO)
             console.log('133')
             coords = new Vector2(base.x, base.y)
             console.log('13223')
         }
         else {
-            console.log('1ddds')
             coords = new Vector2(dataDTO.x, dataDTO.y)
-            console.log('1dw')
         }
         console.log('1')
         return await this.findObjects(coords, zone)
