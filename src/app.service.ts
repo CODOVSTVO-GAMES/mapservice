@@ -53,6 +53,9 @@ export class AppService {
         let dataDTO
         try {
             dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y)
+            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
+                throw 'Пришли пустые данные'
+            }
         } catch (e) {
             throw "parsing data error"
         }
