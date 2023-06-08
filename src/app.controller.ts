@@ -16,9 +16,4 @@ export class AppController {
     async getMap(data: any): Promise<ResponseDTO> {
         return await this.appService.mapGetResponser(data)
     }
-
-    @EventPattern('get_my_coords')
-    async getCoords(data: any): Promise<ResponseDTO> {
-        return await this.appService.coordBaseGetResponser(data)
-    }
 }

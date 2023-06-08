@@ -72,11 +72,38 @@ export class AppService {
          * мы доверяем редису что у него последние данные
          * игрок запрашивает карту, мы выдаем ему ближайшие к его координате чанки
          */
+        let base: Building
 
         const zone = dataDTO.zone
-        const coords = new Vector2(dataDTO.x, dataDTO.y)
+        let coords: Vector2
+
+        if (dataDTO.x == 0 && dataDTO.y == 0) {
+            base = await this.getBase(dataDTO)
+            coords = new Vector2(base.x, base.y)
+        }
+        else {
+            coords = new Vector2(dataDTO.x, dataDTO.y)
+        }
 
         return await this.findObjects(coords, zone)
+    }
+
+    async getBase(dataDTO: DataDTO): Promise<Building> {
+        /**
+         * ищем аккаунт по айди
+         * если не находим создаем базу в рандомных координатах
+         * если находим отправляем координаты
+         */
+        let building: Building
+        try {
+            building = await this.getBaceByAccountid(dataDTO.accountId)
+        }
+        catch (e) {
+            console.log('ошибка:    ' + e)
+            building = await this.createBace(dataDTO.accountId, dataDTO.zone)
+        }
+
+        return building
     }
 
     async findObjects(vector: Vector2, zone: string): Promise<Building[]> {
@@ -118,60 +145,6 @@ export class AppService {
         return new Vector2(xChunk, yChunk)
     }
 
-    async coordBaseGetResponser(data: any): Promise<ResponseDTO> {
-        const responseDTO = new ResponseDTO()
-        let status = 200
-
-        try {
-            const response = await this.coordBaseGetHandler(data)
-            responseDTO.data = response
-        }
-        catch (e) {
-            if (e == 'sessions not found' || e == 'session expired') {
-                status = 403//перезапуск клиента
-            }
-            else if (e == 'too many requests') {
-                status = 429//повторить запрос позже
-            } else if (e == 'parsing data error') {
-                status = 400 //сервер не знает что делать
-            } else {
-                status = 400
-            }
-            console.log("Ошибка " + e)
-        }
-        responseDTO.status = status
-        return responseDTO
-    }
-
-    async coordBaseGetHandler(data: any): Promise<object> {
-        let dataDTO
-        try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y)
-        } catch (e) {
-            throw "parsing data error"
-        }
-
-        return await this.coordBaseGetLogic(dataDTO)
-    }
-
-    async coordBaseGetLogic(dataDTO: DataDTO): Promise<object> {
-        /**
-         * ищем аккаунт по айди
-         * если не находим создаем базу в рандомных координатах
-         * если находим отправляем координаты
-         */
-        let building: Building
-        try {
-            building = await this.getBaceByAccountid(dataDTO.accountId)
-        }
-        catch (e) {
-            console.log('ошибка:    ' + e)
-            building = await this.createBace(dataDTO.accountId, dataDTO.zone)
-        }
-
-        return { x: building.x, y: building.y }
-    }
-
     async getBaceByAccountid(accountId: string): Promise<Building> {
         const buildings = await this.mapRepo.find({
             where: {
@@ -182,17 +155,48 @@ export class AppService {
     }
 
     async createBace(accountId: string, zone: string) {
+        const freeCoordinates = await this.generateFreeCoordinates()
         return await this.mapRepo.save(
             this.mapRepo.create(
                 {
                     accountId: accountId,
                     zone: zone,
                     type: 'base',
-                    x: 1,
-                    y: 1,
+                    x: freeCoordinates.x,
+                    y: freeCoordinates.y
                 }
             )
         )
+    }
+
+    private generateRandomCoordinate() {
+        return Math.floor(Math.random() * this.mapSizeCells)
+    }
+
+    private async generateFreeCoordinates(): Promise<Vector2> {
+        const x = this.generateRandomCoordinate()
+        const y = this.generateRandomCoordinate()
+        if (await this.isCoordinatesFree(x, y)) {
+            return new Vector2(x, y)
+        }
+        else {
+            return await this.generateFreeCoordinates()
+        }
+    }
+
+    private async isCoordinatesFree(x: number, y: number): Promise<boolean> {
+        const result = await this.mapRepo.find({
+            where: {
+                x: x,
+                y: y
+            }
+        })
+        if (result[0]) {
+            console.log('---' + result[0])
+            return false
+        } else {
+            return true
+        }
     }
 }
 
