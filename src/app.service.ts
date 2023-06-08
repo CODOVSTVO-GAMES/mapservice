@@ -155,8 +155,7 @@ export class AppService {
                 accountId: accountId
             }
         })
-        console.log('ddd' + JSON.stringify(buildings[0]))
-        console.log(buildings.length)
+        if (buildings.length == 0) throw 'Обьект пустой'
         return buildings[0]
     }
 
