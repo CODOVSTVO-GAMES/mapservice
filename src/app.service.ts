@@ -84,7 +84,6 @@ export class AppService {
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
         }
-        console.log('1')
         return await this.findObjects(coords, zone)
     }
 
@@ -111,9 +110,12 @@ export class AppService {
         //получить координату начала и конца чанка по двум осям
 
         const xStart = this.getChunkStartCoord(vector.x)
+        console.log("xs " + xStart)
         const yStart = this.getChunkStartCoord(vector.y)
 
+
         const xEnd = this.getChunkEndCoord(vector.x)
+        console.log("xe " + xEnd)
         const yEnd = this.getChunkEndCoord(vector.y)
 
         const buildings = await this.mapRepo.find({
