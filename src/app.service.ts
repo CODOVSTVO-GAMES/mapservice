@@ -79,7 +79,7 @@ export class AppService {
 
         if (dataDTO.x == 0 && dataDTO.y == 0) {
             base = await this.getBase(dataDTO)
-            coords = new Vector2(base.x / this.getChunkSize(), base.y / this.getChunkSize())
+            coords = new Vector2(base.x, base.y)
         }
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
@@ -131,11 +131,11 @@ export class AppService {
     }
 
     private getChunkStartCoord(coord: number): number {
-        return this.getChunkSize() * coord
+        return coord - coord % this.getChunkSize()
     }
 
     private getChunkEndCoord(coord: number): number {
-        return this.getChunkSize() * (coord + 1) - 1
+        return coord - coord % this.getChunkSize() + this.getChunkSize()
     }
 
     private getChunkSize(): number {
