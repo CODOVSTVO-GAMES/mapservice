@@ -6,13 +6,13 @@ export class Building {
     id: number;
 
     @Column()
-    zoneId: string
+    zone: string
 
-    @Column()
-    chunk: string
+    @Column({ type: "smallint" })
+    x: number
 
-    @Column()
-    coords: string
+    @Column({ type: "smallint" })
+    y: number
 
     @Column()
     type: string

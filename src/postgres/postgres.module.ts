@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Building } from 'src/Models/Bullding';
+import { Building } from 'src/Models/Building';
 
 @Module({
   imports: [
