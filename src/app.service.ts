@@ -125,6 +125,7 @@ export class AppService {
                 y: Between(yStart, yEnd)
             }
         })
+        console.log('Найдено обьектов ' + buildings.length)
         return buildings
     }
 
