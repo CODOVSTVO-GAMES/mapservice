@@ -3,7 +3,7 @@ import { ResponseDTO } from './DTO/ResponseDTO';
 import { DataDTO } from './DTO/DataDTO';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Building } from './Models/Building';
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { LoggerService } from './logger/logger.service';
 import { RabbitMQService } from './rabbit/rabbit.servicve';
 
@@ -50,6 +50,7 @@ export class AppService {
     }
 
     async mapGetHandler(data: any): Promise<Building[]> {
+        console.log(JSON.stringify(data))
         let dataDTO
         try {
             dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y)
