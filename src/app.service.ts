@@ -129,14 +129,17 @@ export class AppService {
     }
 
     private getChunkStartCoord(coord: number): number {
+        console.log('getChunkStartCoord ' + this.getChunkSize() * coord)
         return this.getChunkSize() * coord
     }
 
     private getChunkEndCoord(coord: number): number {
+        console.log('getChunkEndCoord ' + (this.getChunkSize() * (coord + 1) - 1))
         return this.getChunkSize() * (coord + 1) - 1
     }
 
     private getChunkSize(): number {
+        console.log('getChunkSize ' + this.mapSizeCells / this.mapSizeChunks)
         return this.mapSizeCells / this.mapSizeChunks
     }
 
@@ -153,7 +156,7 @@ export class AppService {
                 accountId: accountId
             }
         })
-        if (buildings.length == 0) throw 'Обьект пустой'
+        if (buildings.length == 0) throw 'Баны не существует'
         return buildings[0]
     }
 
