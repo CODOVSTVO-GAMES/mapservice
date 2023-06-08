@@ -103,15 +103,11 @@ export class AppService {
          */
         let building: Building
         try {
-            console.log('ss')
             building = await this.getBaceByAccountid(dataDTO.accountId)
-            console.log('ssdsqwqwdqw')
         }
         catch (e) {
-            console.log('sswwwwwwwwwwwwwww')
             console.log('ошибка:    ' + e)
             building = await this.createBace(dataDTO.accountId, dataDTO.zone)
-            console.log('sswdwqwdqwdqwdqwdqw')
         }
 
         return building
@@ -162,6 +158,8 @@ export class AppService {
                 accountId: accountId
             }
         })
+        console.log('ddd' + JSON.stringify(buildings[0]))
+        console.log(buildings.length)
         return buildings[0]
     }
 
