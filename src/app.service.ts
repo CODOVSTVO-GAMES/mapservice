@@ -175,7 +175,7 @@ export class AppService {
     }
 
     private generateRandomCoordinate() {
-        return Math.floor(Math.random() * this.mapSizeCells)
+        return Math.floor(Math.random() * this.mapSizeCells / this.mapSizeChunks)
     }
 
     private async generateFreeCoordinates(): Promise<Vector2> {
