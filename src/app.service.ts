@@ -109,12 +109,12 @@ export class AppService {
         //запросить весь чанк из бд
         //получить координату начала и конца чанка по двум осям
 
-        const xStart = this.getChunkStartCoord(vector.x)
-        const yStart = this.getChunkStartCoord(vector.y)
+        const xStart = this.getChunkStartCoord(vector.x) - 1
+        const yStart = this.getChunkStartCoord(vector.y) - 1
 
 
-        const xEnd = this.getChunkEndCoord(vector.x)
-        const yEnd = this.getChunkEndCoord(vector.y)
+        const xEnd = this.getChunkEndCoord(vector.x) - 1
+        const yEnd = this.getChunkEndCoord(vector.y) - 1
 
         console.log('x ' + xStart + ':' + xEnd)
         console.log('y ' + yStart + ':' + yEnd)
@@ -122,8 +122,8 @@ export class AppService {
         const buildings = await this.mapRepo.find({
             where: {
                 zone: zone,
-                x: Between(xStart - 1, xEnd - 1),
-                y: Between(yStart - 1, yEnd - 1)
+                x: Between(xStart, xEnd),
+                y: Between(yStart, yEnd)
             }
         })
         console.log('Найдено обьектов ' + buildings.length)
