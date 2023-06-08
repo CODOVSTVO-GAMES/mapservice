@@ -114,6 +114,83 @@ export class AppService {
 
         return new Vector2(xChunk, yChunk)
     }
+
+    async coordBaseGetResponser(data: any): Promise<ResponseDTO> {
+        const responseDTO = new ResponseDTO()
+        let status = 200
+
+        try {
+            const response = await this.coordBaseGetHandler(data)
+            responseDTO.data = response
+        }
+        catch (e) {
+            if (e == 'sessions not found' || e == 'session expired') {
+                status = 403//перезапуск клиента
+            }
+            else if (e == 'too many requests') {
+                status = 429//повторить запрос позже
+            } else if (e == 'parsing data error') {
+                status = 400 //сервер не знает что делать
+            } else {
+                status = 400
+            }
+            console.log("Ошибка " + e)
+        }
+        responseDTO.status = status
+        return responseDTO
+    }
+
+    async coordBaseGetHandler(data: any): Promise<object> {
+        let dataDTO
+        try {
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y)
+        } catch (e) {
+            throw "parsing data error"
+        }
+
+        return await this.coordBaseGetLogic(dataDTO)
+    }
+
+    async coordBaseGetLogic(dataDTO: DataDTO): Promise<object> {
+        /**
+         * ищем аккаунт по айди
+         * если не находим создаем базу в рандомных координатах
+         * если находим отправляем координаты
+         */
+        let building: Building
+        try {
+            building = await this.getBaceByAccountid(dataDTO.accountId)
+        }
+        catch (e) {
+            console.log('ошибка:    ' + e)
+            building = await this.createBace(dataDTO.accountId, dataDTO.zone)
+        }
+
+        return { x: building.x, y: building.y }
+    }
+
+    async getBaceByAccountid(accountId: string): Promise<Building> {
+        const buildings = await this.mapRepo.find({
+            where: {
+                accountId: accountId
+            }
+        })
+        return buildings[0]
+    }
+
+    async createBace(accountId: string, zone: string) {
+        return await this.mapRepo.save(
+            this.mapRepo.create(
+                {
+                    accountId: accountId,
+                    zone: zone,
+                    type: 'base',
+                    x: 1,
+                    y: 1,
+                }
+            )
+        )
+    }
 }
 
 class Vector2 {
