@@ -50,7 +50,6 @@ export class AppService {
     }
 
     async mapGetHandler(data: any): Promise<Building[]> {
-        console.log(JSON.stringify(data))
         let dataDTO
         try {
             dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y)
@@ -65,7 +64,6 @@ export class AppService {
     }
 
     async mapGetLogic(dataDTO: DataDTO): Promise<Building[]> {
-        console.log(dataDTO)
         /**
          * у игрока есть адрес базы и айди зоны
          * В базе данных лежат обьекты карты
@@ -81,9 +79,7 @@ export class AppService {
 
         if (dataDTO.x == 0 && dataDTO.y == 0) {
             base = await this.getBase(dataDTO)
-            console.log('133')
             coords = new Vector2(base.x, base.y)
-            console.log('13223')
         }
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
@@ -197,7 +193,6 @@ export class AppService {
             }
         })
         if (result[0]) {
-            console.log('---' + result[0])
             return false
         } else {
             return true
