@@ -122,8 +122,8 @@ export class AppService {
         const buildings = await this.mapRepo.find({
             where: {
                 zone: zone,
-                x: Between(xStart, xEnd),
-                y: Between(yStart, yEnd)
+                x: Between(xStart - 1, xEnd - 1),
+                y: Between(yStart - 1, yEnd - 1)
             }
         })
         console.log('Найдено обьектов ' + buildings.length)
