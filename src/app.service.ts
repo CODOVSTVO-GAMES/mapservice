@@ -79,6 +79,7 @@ export class AppService {
 
         if (dataDTO.x == 0 && dataDTO.y == 0) {
             base = await this.getBase(dataDTO)
+            console.log(JSON.stringify(base))
             coords = new Vector2(base.x, base.y)
         }
         else {
