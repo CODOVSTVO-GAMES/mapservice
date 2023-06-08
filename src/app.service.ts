@@ -110,13 +110,14 @@ export class AppService {
         //получить координату начала и конца чанка по двум осям
 
         const xStart = this.getChunkStartCoord(vector.x)
-        console.log("xs " + xStart)
         const yStart = this.getChunkStartCoord(vector.y)
 
 
         const xEnd = this.getChunkEndCoord(vector.x)
-        console.log("xe " + xEnd)
         const yEnd = this.getChunkEndCoord(vector.y)
+
+        console.log('x ' + xStart + ':' + xEnd)
+        console.log('y ' + yStart + ':' + yEnd)
 
         const buildings = await this.mapRepo.find({
             where: {
@@ -130,17 +131,14 @@ export class AppService {
     }
 
     private getChunkStartCoord(coord: number): number {
-        console.log('getChunkStartCoord ' + this.getChunkSize() * coord)
         return this.getChunkSize() * coord
     }
 
     private getChunkEndCoord(coord: number): number {
-        console.log('getChunkEndCoord ' + (this.getChunkSize() * (coord + 1) - 1))
         return this.getChunkSize() * (coord + 1) - 1
     }
 
     private getChunkSize(): number {
-        console.log('getChunkSize ' + this.mapSizeCells / this.mapSizeChunks)
         return this.mapSizeCells / this.mapSizeChunks
     }
 
