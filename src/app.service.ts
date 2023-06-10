@@ -155,7 +155,7 @@ export class AppService {
                 accountId: accountId
             }
         })
-        if (buildings.length == 0) throw 'Баны не существует'
+        if (buildings.length == 0) throw 'Базы не существует'
         return buildings[0]
     }
 
