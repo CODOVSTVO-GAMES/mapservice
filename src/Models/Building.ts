@@ -25,4 +25,7 @@ export class Building {
 
     @Column({ nullable: true })
     stars: number
+
+    @Column({ type: "bigint" })
+    expiration: number
 }

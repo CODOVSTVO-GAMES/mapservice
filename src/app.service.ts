@@ -52,7 +52,7 @@ export class AppService {
     async mapGetHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y)
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber)
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
                 throw 'Пришли пустые данные'
             }
@@ -98,6 +98,7 @@ export class AppService {
             building = await this.getBaceByAccountid(dataDTO.accountId)
         }
         catch (e) {
+            //возможны неконтролируемые ошибки
             console.log('ошибка:    ' + e)
             building = await this.createBace(dataDTO.accountId, dataDTO.zone)
         }
@@ -105,19 +106,15 @@ export class AppService {
         return building
     }
 
-    async findObjects(vector: Vector2, zone: string): Promise<Building[]> {
+    async findObjects(coords: Vector2, zone: string): Promise<Building[]> {
         //запросить весь чанк из бд
         //получить координату начала и конца чанка по двум осям
 
-        const xStart = this.getChunkStartCoord(vector.x) - 1
-        const yStart = this.getChunkStartCoord(vector.y) - 1
+        const xStart = this.getChunkStartCoord(coords.x) - 1
+        const yStart = this.getChunkStartCoord(coords.y) - 1
 
-
-        const xEnd = this.getChunkEndCoord(vector.x) - 1
-        const yEnd = this.getChunkEndCoord(vector.y) - 1
-
-        console.log('x ' + xStart + ':' + xEnd)
-        console.log('y ' + yStart + ':' + yEnd)
+        const xEnd = this.getChunkEndCoord(coords.x) - 1
+        const yEnd = this.getChunkEndCoord(coords.y) - 1
 
         const buildings = await this.mapRepo.find({
             where: {
@@ -126,7 +123,6 @@ export class AppService {
                 y: Between(yStart, yEnd)
             }
         })
-        console.log('Найдено обьектов ' + buildings.length)
         return buildings
     }
 
@@ -142,13 +138,6 @@ export class AppService {
         return this.mapSizeCells / this.mapSizeChunks
     }
 
-    private getChunk(vector: Vector2): Vector2 {
-        const xChunk = (vector.x - vector.x % this.mapSizeChunks) / this.mapSizeChunks
-        const yChunk = (vector.y - vector.y % this.mapSizeChunks) / this.mapSizeChunks
-
-        return new Vector2(xChunk, yChunk)
-    }
-
     async getBaceByAccountid(accountId: string): Promise<Building> {
         const buildings = await this.mapRepo.find({
             where: {
@@ -159,7 +148,7 @@ export class AppService {
         return buildings[0]
     }
 
-    async createBace(accountId: string, zone: string) {
+    async createBace(accountId: string, zone: string): Promise<Building> {
         const freeCoordinates = await this.generateFreeCoordinates()
         return await this.mapRepo.save(
             this.mapRepo.create(
@@ -168,7 +157,8 @@ export class AppService {
                     zone: zone,
                     type: 'base',
                     x: freeCoordinates.x,
-                    y: freeCoordinates.y
+                    y: freeCoordinates.y,
+                    expiration: Date.now() + 2592000000 //30 дней
                 }
             )
         )
@@ -201,6 +191,147 @@ export class AppService {
         } else {
             return true
         }
+    }
+
+    //-----------------------------------------------------------------------
+
+    async generateEnemyResponser(data: any): Promise<ResponseDTO> {
+        const responseDTO = new ResponseDTO()
+        let status = 200
+
+        try {
+            const response = await this.generateEnemyHandler(data)
+            responseDTO.data = response
+        }
+        catch (e) {
+            if (e == 'sessions not found' || e == 'session expired') {
+                status = 403//перезапуск клиента
+            }
+            else if (e == 'too many requests') {
+                status = 429//повторить запрос позже
+            } else if (e == 'parsing data error') {
+                status = 400 //сервер не знает что делать
+            } else {
+                status = 400
+            }
+            console.log("Ошибка " + e)
+        }
+        responseDTO.status = status
+        return responseDTO
+    }
+
+
+    async generateEnemyHandler(data: any): Promise<Building[]> {
+        let dataDTO
+        try {
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.leve, data.battlesNumber)
+            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
+                throw 'Пришли пустые данные'
+            }
+        } catch (e) {
+            throw "parsing data error"
+        }
+
+        return await this.generateEnemyLogic(dataDTO)
+    }
+
+    async generateEnemyLogic(dataDTO: DataDTO): Promise<Building[]> {
+        /**
+         * у игрока есть адрес базы и айди зоны
+         * В базе данных лежат обьекты карты
+         * 
+         * запрашиваем обьекты вокруг игрока
+         * проверяем сколько вокруг противников нужного уровня
+         * если больше чем надо просто возвращаем структуру
+         * если меньше то доспавниваем нужное число
+         */
+
+        const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
+        const buildings = await this.findObjects(baseCoords, dataDTO.zone)
+
+        let battleFits = 0
+
+        for (let l = 0; l < buildings.length; l++) {
+            if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
+                battleFits = battleFits++
+                if (battleFits >= dataDTO.battlesNumber) {
+                    return buildings
+                }
+            }
+        }
+
+        const createBattlesNumber = dataDTO.battlesNumber - battleFits
+
+        for (let l = 0; l <= createBattlesNumber; l++) {
+            const type = this.createEnemyType()
+            const stars = this.createEnemyStars()
+            const coords = await this.generateFreeCoordinatesBetveen(dataDTO.x, dataDTO.y)
+
+            buildings.push(await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords))
+        }
+        return buildings
+    }
+
+    private generateNumberBetven(x: number): number {
+        const offset = 20
+        return Math.floor(Math.random() * ((x + offset) - (x - offset))) + (x - offset)
+    }
+
+
+    private async generateFreeCoordinatesBetveen(xBase: number, yBase: number): Promise<Vector2> {
+        const x = this.generateNumberBetven(xBase)
+        const y = this.generateNumberBetven(yBase)
+        if (await this.isCoordinatesFree(xBase, yBase)) {
+            return new Vector2(x, y)
+        }
+        else {
+            return await this.generateFreeCoordinatesBetveen(xBase, yBase)
+        }
+    }
+
+    createEnemyType() {
+        const random = Math.floor(Math.random() * 100);
+        if (random < 60) {
+            return 'taskSalvation'
+        }
+        // else if (random < 95) {
+        //     return TypesRadar.TASK_DARK_LEGION; // этих заданий ещё не существует
+        // }
+        else {
+            return 'taskPersonal'
+        }
+    }
+
+    createEnemyStars(): number {
+        const random = Math.floor(Math.random() * 100);
+        if (random < 50) {
+            return 1;
+        }
+        else if (random < 75) {
+            return 2;
+        }
+        else if (random < 95) {
+            return 3;
+        }
+        else {
+            return 4;
+        }
+    }
+
+    async createEnemy(type: string, level: number, stars: number, zone: string, coords: Vector2): Promise<Building> {
+        return await this.mapRepo.save(
+            this.mapRepo.create(
+                {
+                    zone: zone,
+                    type: type,
+                    level: level,
+                    stars: stars,
+                    x: coords.x,
+                    y: coords.y,
+                    expiration: Date.now() + 600000//10 минут
+                }
+            )
+        )
     }
 }
 
