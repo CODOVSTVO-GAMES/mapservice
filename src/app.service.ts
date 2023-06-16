@@ -247,6 +247,7 @@ export class AppService {
          */
 
         console.log("---")
+        console.log(dataDTO)
         const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
