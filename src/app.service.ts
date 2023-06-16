@@ -279,8 +279,11 @@ export class AppService {
     }
 
     private generateNumberBetven(x: number): number {
+        console.log('Пришло х значение' + x)
         const offset = 20
-        return Math.floor(Math.random() * ((x + offset) - (x - offset))) + (x - offset)
+        const xStart = x - offset
+        const xEnd = x + offset
+        return Math.floor(Math.random() * (xEnd - xStart)) + xStart
     }
 
 
@@ -288,7 +291,7 @@ export class AppService {
         console.log('s')
         const x = this.generateNumberBetven(xBase)
         const y = this.generateNumberBetven(yBase)
-        if (await this.isCoordinatesFree(xBase, yBase)) {
+        if (await this.isCoordinatesFree(x, y)) {
             return new Vector2(x, y)
         }
         else {
