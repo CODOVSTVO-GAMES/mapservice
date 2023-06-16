@@ -255,7 +255,7 @@ export class AppService {
 
         for (let l = 0; l < buildings.length; l++) {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
-                battleFits = battleFits++
+                battleFits += 1
                 if (battleFits >= dataDTO.battlesNumber) {
                     console.log('2')
                     return buildings
