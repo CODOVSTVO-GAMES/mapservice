@@ -257,6 +257,7 @@ export class AppService {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits = battleFits++
                 if (battleFits >= dataDTO.battlesNumber) {
+                    console.log('2')
                     return buildings
                 }
             }
@@ -271,6 +272,7 @@ export class AppService {
 
             buildings.push(await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords))
         }
+        console.log('2')
         return buildings
     }
 
