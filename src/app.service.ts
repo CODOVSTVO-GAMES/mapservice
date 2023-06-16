@@ -265,7 +265,7 @@ export class AppService {
 
         const createBattlesNumber = dataDTO.battlesNumber - battleFits
 
-        for (let l = 0; l <= createBattlesNumber; l++) {
+        for (let l = 0; l < createBattlesNumber; l++) {
             const type = this.createEnemyType()
             const stars = this.createEnemyStars()
             const coords = await this.generateFreeCoordinatesBetveen(dataDTO.x, dataDTO.y)
