@@ -225,7 +225,7 @@ export class AppService {
         let dataDTO
         try {
             dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber)
-            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
+            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y) || dataDTO.level == undefined) {
                 throw 'Пришли пустые данные'
             }
         } catch (e) {
