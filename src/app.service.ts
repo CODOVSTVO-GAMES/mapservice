@@ -264,6 +264,7 @@ export class AppService {
         }
 
         const createBattlesNumber = dataDTO.battlesNumber - battleFits
+        console.log(dataDTO)
 
         for (let l = 0; l <= createBattlesNumber; l++) {
             const type = this.createEnemyType()
