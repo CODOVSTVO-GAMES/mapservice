@@ -17,6 +17,12 @@ export class Building {
     @Column()
     type: string
 
-    @Column()
+    @Column({ nullable: true })
     accountId: string
+
+    @Column({ nullable: true })
+    level: number
+
+    @Column({ nullable: true })
+    stars: number
 }
