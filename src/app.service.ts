@@ -252,10 +252,8 @@ export class AppService {
 
         let battleFits = 0
 
-        console.log('buildings : ' + buildings.length)
 
         for (let l = 0; l < buildings.length; l++) {
-            console.log('k')
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
                 console.log('d')
@@ -287,6 +285,7 @@ export class AppService {
 
 
     private async generateFreeCoordinatesBetveen(xBase: number, yBase: number): Promise<Vector2> {
+        console.log('s')
         const x = this.generateNumberBetven(xBase)
         const y = this.generateNumberBetven(yBase)
         if (await this.isCoordinatesFree(xBase, yBase)) {
