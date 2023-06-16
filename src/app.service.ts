@@ -247,15 +247,18 @@ export class AppService {
          */
 
         console.log("---")
-        console.log(dataDTO.battlesNumber)
         const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
         let battleFits = 0
 
+        console.log('buildings : ' + buildings.length)
+
         for (let l = 0; l < buildings.length; l++) {
+            console.log('k')
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
+                console.log('d')
                 if (battleFits >= dataDTO.battlesNumber) {
                     console.log('2')
                     return buildings
