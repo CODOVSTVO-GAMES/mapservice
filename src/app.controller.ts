@@ -13,7 +13,6 @@ export class AppController {
         return await this.appService.mapGetResponser(data)
     }
 
-
     @EventPattern('get_enemy')
     async getEnemy(data: any): Promise<ResponseDTO> {
         return await this.appService.generateEnemyResponser(data)

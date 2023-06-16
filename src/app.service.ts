@@ -272,6 +272,7 @@ export class AppService {
 
             buildings.push(await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords))
         }
+        console.log('3')
         return buildings
     }
 
