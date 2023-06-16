@@ -256,6 +256,7 @@ export class AppService {
         for (let l = 0; l < buildings.length; l++) {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
+                console.log('dd')
                 if (battleFits > dataDTO.battlesNumber) {
                     console.log('2')
                     return buildings
@@ -269,7 +270,7 @@ export class AppService {
             const type = this.createEnemyType()
             const stars = this.createEnemyStars()
             const coords = await this.generateFreeCoordinatesBetveen(dataDTO.x, dataDTO.y)
-
+            console.log('d')
             buildings.push(await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords))
         }
         console.log('3')
