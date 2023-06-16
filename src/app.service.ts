@@ -256,8 +256,7 @@ export class AppService {
         for (let l = 0; l < buildings.length; l++) {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
-                console.log('d')
-                if (battleFits >= dataDTO.battlesNumber) {
+                if (battleFits > dataDTO.battlesNumber) {
                     console.log('2')
                     return buildings
                 }
@@ -265,7 +264,6 @@ export class AppService {
         }
 
         const createBattlesNumber = dataDTO.battlesNumber - battleFits
-        console.log(dataDTO)
 
         for (let l = 0; l <= createBattlesNumber; l++) {
             const type = this.createEnemyType()
@@ -274,12 +272,10 @@ export class AppService {
 
             buildings.push(await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords))
         }
-        console.log('2')
         return buildings
     }
 
     private generateNumberBetven(x: number): number {
-        console.log('Пришло х значение' + x)
         const offset = 20
         const xStart = x - offset
         const xEnd = x + offset
@@ -288,7 +284,6 @@ export class AppService {
 
 
     private async generateFreeCoordinatesBetveen(xBase: number, yBase: number): Promise<Vector2> {
-        console.log('s')
         const x = this.generateNumberBetven(xBase)
         const y = this.generateNumberBetven(yBase)
         if (await this.isCoordinatesFree(x, y)) {
