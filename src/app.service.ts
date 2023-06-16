@@ -252,14 +252,11 @@ export class AppService {
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
         let battleFits = 0
-        console.log("---ee")
 
 
         for (let l = 0; l < buildings.length; l++) {
-            console.log("---ddd")
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
-                console.log('dd')
                 if (battleFits > dataDTO.battlesNumber) {
                     console.log('2')
                     return buildings
@@ -269,7 +266,6 @@ export class AppService {
 
         const createBattlesNumber = dataDTO.battlesNumber - battleFits
 
-        console.log("---dwsdqwe")
         for (let l = 0; l < createBattlesNumber; l++) {
             const type = this.createEnemyType()
             const stars = this.createEnemyStars()
