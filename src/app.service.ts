@@ -196,6 +196,7 @@ export class AppService {
     //-----------------------------------------------------------------------
 
     async generateEnemyResponser(data: any): Promise<ResponseDTO> {
+        console.log(data)
         const responseDTO = new ResponseDTO()
         let status = 200
 
