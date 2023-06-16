@@ -165,7 +165,7 @@ export class AppService {
     }
 
     private generateRandomCoordinate() {
-        return Math.floor(Math.random() * this.mapSizeCells / this.mapSizeChunks)
+        return Math.floor(Math.random() * this.mapSizeCells / this.mapSizeChunks * 2)
     }
 
     private async generateFreeCoordinates(): Promise<Vector2> {
@@ -255,9 +255,11 @@ export class AppService {
 
 
         for (let l = 0; l < buildings.length; l++) {
+            console.log('1')
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
-                if (battleFits > dataDTO.battlesNumber) {
+                console.log('повторка')
+                if (battleFits >= dataDTO.battlesNumber) {
                     console.log('2')
                     return buildings
                 }
