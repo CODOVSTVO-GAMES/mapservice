@@ -196,7 +196,6 @@ export class AppService {
     //-----------------------------------------------------------------------
 
     async generateEnemyResponser(data: any): Promise<ResponseDTO> {
-        console.log(data)
         const responseDTO = new ResponseDTO()
         let status = 200
 
@@ -247,6 +246,8 @@ export class AppService {
          * если меньше то доспавниваем нужное число
          */
 
+        console.log("---")
+        console.log(dataDTO.battlesNumber)
         const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
