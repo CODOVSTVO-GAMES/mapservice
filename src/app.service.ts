@@ -81,6 +81,7 @@ export class AppService {
         if (dataDTO.x == 0 && dataDTO.y == 0) {
             base = await this.getBase(dataDTO)
             coords = new Vector2(base.x, base.y)
+            console.log('hm')
         }
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
@@ -120,7 +121,7 @@ export class AppService {
             const chunkId = new Vector2(arrChunkId[l].x, arrChunkId[l].y)
             buildings = buildings.concat(await this.getChunkBuildings(chunkId, zone))
         }
-
+        console.log('найдено обьектов ' + buildings.length)
         return buildings
     }
 
