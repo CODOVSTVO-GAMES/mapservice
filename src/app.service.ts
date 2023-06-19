@@ -140,8 +140,6 @@ export class AppService {
     private getChunkId(baseCoords: Vector2): Vector2 {
         const xChunk = Math.floor(baseCoords.x / this.getChunkSize())
         const yChunk = Math.floor(baseCoords.y / this.getChunkSize())
-        console.log('Пришло ' + JSON.stringify(baseCoords))
-        console.log('Чанк номер ' + JSON.stringify(new Vector2(xChunk, yChunk)))
         return new Vector2(xChunk, yChunk)
     }
 
@@ -289,7 +287,6 @@ export class AppService {
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
         let battleFits = 0
-
 
         for (let l = 0; l < buildings.length; l++) {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
