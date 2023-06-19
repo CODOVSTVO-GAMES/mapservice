@@ -96,11 +96,13 @@ export class AppService {
         let building: Building
         try {
             building = await this.getBaceByAccountid(dataDTO.accountId)
+            building.level = dataDTO.level
+            await this.mapRepo.save(building)
         }
         catch (e) {
             //возможны неконтролируемые ошибки
             console.log('ошибка:    ' + e)
-            building = await this.createBace(dataDTO.accountId, dataDTO.zone)
+            building = await this.createBace(dataDTO.accountId, dataDTO.zone, dataDTO.level)
         }
 
         return building
