@@ -148,7 +148,7 @@ export class AppService {
         return buildings[0]
     }
 
-    async createBace(accountId: string, zone: string): Promise<Building> {
+    async createBace(accountId: string, zone: string, level = 1): Promise<Building> {
         const freeCoordinates = await this.generateFreeCoordinates()
         return await this.mapRepo.save(
             this.mapRepo.create(
@@ -158,7 +158,8 @@ export class AppService {
                     type: 'base',
                     x: freeCoordinates.x,
                     y: freeCoordinates.y,
-                    expiration: Date.now() + 2592000000 //30 дней
+                    expiration: Date.now() + 2592000000, //30 дней
+                    level: level
                 }
             )
         )
