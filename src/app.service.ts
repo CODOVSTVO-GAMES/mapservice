@@ -131,6 +131,9 @@ export class AppService {
         const startCoord = this.getChunkStartCoord(chunkId)
         const endCoord = this.getChunkEndCoord(chunkId)
 
+        console.log(JSON.stringify(startCoord))
+        console.log(JSON.stringify(endCoord))
+
         const buildings = await this.mapRepo.find({
             where: {
                 zone: zone,
@@ -159,11 +162,10 @@ export class AppService {
         arr.push(new Vector2(chunk.x + 1, chunk.y + 1))
         arr.push(new Vector2(chunk.x - 1, chunk.y - 1))
         arr.push(new Vector2(chunk.x + 1, chunk.y - 1))
-        console.log('--' + JSON.stringify(arr))
         return arr
     }
 
-    private getChunkStartCoord(vector: Vector2): Vector2 {
+    private getChunkStartCoord(vector: Vector2): Vector2 {//ащиббка тут
         const x = vector.x - vector.x % this.getChunkSize()
         const y = vector.y - vector.y % this.getChunkSize()
         return new Vector2(x, y)
