@@ -12,7 +12,7 @@ import { RabbitMQService } from './rabbit/rabbit.servicve';
 export class AppService {
 
     private mapSizeCells = 512
-    private mapSizeChunks = 16
+    private mapSizeChunks = 32
 
     constructor(
         @InjectRepository(Building) private mapRepo: Repository<Building>
@@ -140,8 +140,8 @@ export class AppService {
     private getChunkId(baseCoords: Vector2): Vector2 {
         const xChunk = Math.floor(baseCoords.x / this.getChunkSize())
         const yChunk = Math.floor(baseCoords.y / this.getChunkSize())
-        console.log('Пришло ' + baseCoords)
-        console.log('Чанк номер ' + new Vector2(xChunk, yChunk))
+        console.log('Пришло ' + JSON.stringify(baseCoords))
+        console.log('Чанк номер ' + JSON.stringify(new Vector2(xChunk, yChunk)))
         return new Vector2(xChunk, yChunk)
     }
 
@@ -204,7 +204,7 @@ export class AppService {
     }
 
     private generateRandomCoordinate() {
-        return Math.floor(Math.random() * this.mapSizeCells / this.mapSizeChunks * 2)
+        return Math.floor(Math.random() * this.mapSizeCells / this.mapSizeChunks * 4)
     }
 
     private async generateFreeCoordinates(): Promise<Vector2> {
