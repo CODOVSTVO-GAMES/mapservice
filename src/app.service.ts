@@ -84,6 +84,7 @@ export class AppService {
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
         }
+        console.log(dataDTO)
         return await this.findObjects(coords, zone)
     }
 
@@ -258,12 +259,9 @@ export class AppService {
 
 
         for (let l = 0; l < buildings.length; l++) {
-            console.log('1')
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
-                console.log('повторка')
                 if (battleFits >= dataDTO.battlesNumber) {
-                    console.log('2')
                     return buildings
                 }
             }
@@ -278,7 +276,6 @@ export class AppService {
             console.log('d')
             buildings.push(await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords))
         }
-        console.log('3')
         return buildings
     }
 
