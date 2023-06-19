@@ -150,6 +150,7 @@ export class AppService {
     private getNearestChunksId(coords: Vector2): Vector2[] {
         const chunk = this.getChunkId(coords)
         const arr = []
+        arr.push(chunk)
         arr.push(new Vector2(chunk.x - 1, chunk.y))
         arr.push(new Vector2(chunk.x + 1, chunk.y))
         arr.push(new Vector2(chunk.x, chunk.y + 1))
