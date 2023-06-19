@@ -81,7 +81,7 @@ export class AppService {
         if (dataDTO.x == 0 && dataDTO.y == 0) {
             base = await this.getBase(dataDTO)
             coords = new Vector2(base.x, base.y)
-            console.log('hm')
+            console.log('hm' + coords.x + ' ' + coords.y)
         }
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
