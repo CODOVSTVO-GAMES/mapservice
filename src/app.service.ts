@@ -119,7 +119,9 @@ export class AppService {
         let buildings: Building[] = []
         for (let l = 0; l < arrChunkId.length; l++) {
             const chunkId = new Vector2(arrChunkId[l].x, arrChunkId[l].y)
-            buildings = buildings.concat(await this.getChunkBuildings(chunkId, zone))
+            const newBuildings = await this.getChunkBuildings(chunkId, zone)
+            buildings = buildings.concat(newBuildings)
+            console.log('в чанке ' + newBuildings.length)
         }
         console.log('найдено обьектов ' + buildings.length)
         return buildings
