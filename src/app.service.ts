@@ -12,7 +12,7 @@ import { RabbitMQService } from './rabbit/rabbit.servicve';
 export class AppService {
 
     private mapSizeCells = 512
-    private mapSizeChunks = 8
+    private mapSizeChunks = 16
 
     constructor(
         @InjectRepository(Building) private mapRepo: Repository<Building>
@@ -84,7 +84,6 @@ export class AppService {
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
         }
-        console.log(dataDTO)
         return await this.findObjects(coords, zone)
     }
 
@@ -113,29 +112,65 @@ export class AppService {
         //запросить весь чанк из бд
         //получить координату начала и конца чанка по двум осям
 
-        const xStart = this.getChunkStartCoord(coords.x) - 1
-        const yStart = this.getChunkStartCoord(coords.y) - 1
+        const arrChunkId = this.getNearestChunksId(coords)
 
-        const xEnd = this.getChunkEndCoord(coords.x) - 1
-        const yEnd = this.getChunkEndCoord(coords.y) - 1
+        let buildings: Building[] = []
+        for (let l = 0; l < arrChunkId.length; l++) {
+            const chunkId = new Vector2(arrChunkId[l].x, arrChunkId[l].y)
+            buildings = buildings.concat(await this.getChunkBuildings(chunkId, zone))
+        }
+
+        return buildings
+    }
+
+    private async getChunkBuildings(chunkId: Vector2, zone: string): Promise<Building[]> {
+        const startCoord = this.getChunkStartCoord(chunkId)
+        const endCoord = this.getChunkEndCoord(chunkId)
 
         const buildings = await this.mapRepo.find({
             where: {
                 zone: zone,
-                x: Between(xStart, xEnd),
-                y: Between(yStart, yEnd)
+                x: Between(startCoord.x, endCoord.x),
+                y: Between(startCoord.y, endCoord.y)
             }
         })
         return buildings
     }
 
-    private getChunkStartCoord(coord: number): number {
-        return coord - coord % this.getChunkSize()
+    private getChunkId(baseCoords: Vector2): Vector2 {
+        const xChunk = Math.floor(baseCoords.x / this.getChunkSize())
+        const yChunk = Math.floor(baseCoords.y / this.getChunkSize())
+        console.log('Пришло ' + baseCoords)
+        console.log('Чанк номер ' + new Vector2(xChunk, yChunk))
+        return new Vector2(xChunk, yChunk)
     }
 
-    private getChunkEndCoord(coord: number): number {
-        return coord - coord % this.getChunkSize() + this.getChunkSize()
+    private getNearestChunksId(coords: Vector2): Vector2[] {
+        const chunk = this.getChunkId(coords)
+        const arr = []
+        arr.push(new Vector2(chunk.x - 1, chunk.y))
+        arr.push(new Vector2(chunk.x + 1, chunk.y))
+        arr.push(new Vector2(chunk.x, chunk.y + 1))
+        arr.push(new Vector2(chunk.x, chunk.y - 1))
+        arr.push(new Vector2(chunk.x - 1, chunk.y + 1))
+        arr.push(new Vector2(chunk.x + 1, chunk.y + 1))
+        arr.push(new Vector2(chunk.x - 1, chunk.y - 1))
+        arr.push(new Vector2(chunk.x + 1, chunk.y - 1))
+        return arr
     }
+
+    private getChunkStartCoord(vector: Vector2): Vector2 {
+        const x = vector.x - vector.x % this.getChunkSize()
+        const y = vector.y - vector.y % this.getChunkSize()
+        return new Vector2(x, y)
+    }
+
+    private getChunkEndCoord(vector: Vector2): Vector2 {
+        const x = vector.x - vector.x % this.getChunkSize() + this.getChunkSize()
+        const y = vector.y - vector.y % this.getChunkSize() + this.getChunkSize()
+        return new Vector2(x, y)
+    }
+
 
     private getChunkSize(): number {
         return this.mapSizeCells / this.mapSizeChunks
@@ -250,8 +285,6 @@ export class AppService {
          * если меньше то доспавниваем нужное число
          */
 
-        console.log("---")
-        console.log(dataDTO)
         const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
@@ -273,7 +306,6 @@ export class AppService {
             const type = this.createEnemyType()
             const stars = this.createEnemyStars()
             const coords = await this.generateFreeCoordinatesBetveen(dataDTO.x, dataDTO.y)
-            console.log('d')
             buildings.push(await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords))
         }
         return buildings
