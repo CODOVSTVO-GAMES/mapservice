@@ -81,11 +81,11 @@ export class AppService {
         if (dataDTO.x == 0 && dataDTO.y == 0) {
             base = await this.getBase(dataDTO)
             coords = new Vector2(base.x, base.y)
-            console.log('hm' + coords.x + ' ' + coords.y)
         }
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
         }
+        console.log('hm' + coords.x + ' ' + coords.y)
         return await this.findObjects(coords, zone)
     }
 
@@ -159,6 +159,7 @@ export class AppService {
         arr.push(new Vector2(chunk.x + 1, chunk.y + 1))
         arr.push(new Vector2(chunk.x - 1, chunk.y - 1))
         arr.push(new Vector2(chunk.x + 1, chunk.y - 1))
+        console.log('--' + JSON.stringify(arr))
         return arr
     }
 
@@ -207,7 +208,7 @@ export class AppService {
     }
 
     private generateRandomCoordinate() {
-        return Math.floor(Math.random() * this.mapSizeCells / this.mapSizeChunks * 4)
+        return Math.floor(Math.random() * this.mapSizeCells / this.mapSizeChunks * 2)
     }
 
     private async generateFreeCoordinates(): Promise<Vector2> {
