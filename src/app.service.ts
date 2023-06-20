@@ -434,7 +434,7 @@ export class AppService {
     async attackEnemyHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.enemyId)
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.enemyId, data.taskStatus)
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
                 throw 'Пришли пустые данные'
             }
@@ -454,6 +454,7 @@ export class AppService {
         console.log(dataDTO)
 
         if (dataDTO.taskStatus) {
+            console.log('удалить')
             this.mapRepo.createQueryBuilder().delete().from(Building).where("id = :id", { id: dataDTO.enemyId })
             return []
         }
