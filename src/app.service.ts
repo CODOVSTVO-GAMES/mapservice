@@ -290,11 +290,12 @@ export class AppService {
          * если меньше то доспавниваем нужное число
          */
 
+        console.log('1')
         const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
         let battleFits = 0
-
+        console.log('2')
         for (let l = 0; l < buildings.length; l++) {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
@@ -303,14 +304,18 @@ export class AppService {
                 }
             }
         }
+        console.log('3')
 
         const createBattlesNumber = dataDTO.battlesNumber - battleFits
+
+        console.log('4')
 
         for (let l = 0; l < createBattlesNumber; l++) {
             const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
             const enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
             buildings.push(enemy)
         }
+        console.log('5')
         return buildings
     }
 
