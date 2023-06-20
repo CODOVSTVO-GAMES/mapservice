@@ -6,8 +6,6 @@ import { Building } from './Models/Building';
 import { Between, Repository } from 'typeorm';
 import { LoggerService } from './logger/logger.service';
 import { RabbitMQService } from './rabbit/rabbit.servicve';
-import { get } from 'http';
-import e from 'express';
 
 
 @Injectable()
@@ -122,9 +120,7 @@ export class AppService {
             const chunkId = new Vector2(arrChunkId[l].x, arrChunkId[l].y)
             const newBuildings = await this.getChunkBuildings(chunkId, zone)
             buildings = buildings.concat(newBuildings)
-            console.log('в чанке ' + newBuildings.length + " " + JSON.stringify(newBuildings))
         }
-        console.log('Найдено ' + buildings.length)
 
         return buildings
     }
@@ -291,12 +287,10 @@ export class AppService {
          * если меньше то доспавниваем нужное число
          */
 
-        console.log('1')
         const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
         let battleFits = 0
-        console.log('2 ' + buildings.length)
 
         for (let l = 0; l < buildings.length; l++) {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
@@ -307,18 +301,15 @@ export class AppService {
                 }
             }
         }
-        console.log('3')
 
         const createBattlesNumber = dataDTO.battlesNumber - battleFits
 
-        console.log('4')
 
         for (let l = 0; l < createBattlesNumber; l++) {
             const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
             const enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
             buildings.push(enemy)
         }
-        console.log('5 ' + buildings.length)
         return buildings
     }
 
