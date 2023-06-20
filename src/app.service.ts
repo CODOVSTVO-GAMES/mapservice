@@ -367,6 +367,7 @@ export class AppService {
     }
 
     async createEnemy(type: string, level: number, stars: number, zone: string, coords: Vector2): Promise<Building> {
+        console.log('Вызов создания врага')
         return await this.mapRepo.save(
             this.mapRepo.create(
                 {
