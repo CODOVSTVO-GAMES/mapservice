@@ -115,6 +115,7 @@ export class AppService {
         //получить координату начала и конца чанка по двум осям
 
         const arrChunkId = this.getNearestChunksId(coords)
+        console.log(JSON.stringify(arrChunkId))
 
         let buildings: Building[] = []
         for (let l = 0; l < arrChunkId.length; l++) {
@@ -123,6 +124,7 @@ export class AppService {
             buildings = buildings.concat(newBuildings)
         }
         console.log('Найдено ' + buildings.length)
+
         return buildings
     }
 
