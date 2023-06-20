@@ -113,7 +113,6 @@ export class AppService {
         //получить координату начала и конца чанка по двум осям
 
         const arrChunkId = this.getNearestChunksId(coords)
-        console.log(JSON.stringify(arrChunkId))
 
         let buildings: Building[] = []
         for (let l = 0; l < arrChunkId.length; l++) {
@@ -296,7 +295,6 @@ export class AppService {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
                 if (battleFits >= dataDTO.battlesNumber) {
-                    console.log('22 ' + buildings.length)
                     return buildings
                 }
             }
