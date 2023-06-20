@@ -264,11 +264,10 @@ export class AppService {
     async generateEnemyHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumberr, data.battleOwner)
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner)
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y) || dataDTO.level == undefined) {
                 throw 'Пришли пустые данные'
             }
-            if (Number.isNaN(dataDTO.battlesNumber)) { dataDTO.battlesNumber = 1 }
         } catch (e) {
             throw "parsing data error"
         }
