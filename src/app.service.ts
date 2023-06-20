@@ -407,6 +407,7 @@ export class AppService {
     //--------------------
 
     async attackEnemyResponser(data: any): Promise<ResponseDTO> {
+        console.log(data)
         const responseDTO = new ResponseDTO()
         let status = 200
 
