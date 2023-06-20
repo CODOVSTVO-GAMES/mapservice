@@ -75,7 +75,6 @@ export class AppService {
          * игрок запрашивает карту, мы выдаем ему ближайшие к его координате чанки
          */
         let base: Building
-        console.log(JSON.stringify(dataDTO))
 
         const zone = dataDTO.zone
         let coords: Vector2

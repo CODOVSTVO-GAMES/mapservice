@@ -29,6 +29,6 @@ export class Building {
     @Column({ type: "bigint" })
     expiration: number
 
-    @Column()
+    @Column({ nullable: true })
     battleOwner: string
 }
