@@ -395,7 +395,7 @@ export class AppService {
     private getRandomBattleTime() {
         const minTime = 10000
         const maxTime = 20000
-        return Math.abs(Math.random() * (maxTime - minTime) + minTime)
+        return Math.floor(Math.random() * (maxTime - minTime) + minTime)
 
     }
 
