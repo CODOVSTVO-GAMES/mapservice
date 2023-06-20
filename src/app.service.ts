@@ -167,15 +167,15 @@ export class AppService {
         return arr
     }
 
-    private getChunkStartCoord(vector: Vector2): Vector2 {//ащиббка тут, не правильно определяются координаты чанков
-        const x = vector.x - vector.x % this.getChunkSize()
-        const y = vector.y - vector.y % this.getChunkSize()
+    private getChunkStartCoord(vector: Vector2): Vector2 {
+        const x = vector.x * this.getChunkSize()
+        const y = vector.y * this.getChunkSize()
         return new Vector2(x, y)
     }
 
     private getChunkEndCoord(vector: Vector2): Vector2 {
-        const x = vector.x - vector.x % this.getChunkSize() + this.getChunkSize()
-        const y = vector.y - vector.y % this.getChunkSize() + this.getChunkSize()
+        const x = vector.x * this.getChunkSize() + this.getChunkSize()
+        const y = vector.y * this.getChunkSize() + this.getChunkSize()
         return new Vector2(x, y)
     }
 
