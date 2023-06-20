@@ -276,6 +276,7 @@ export class AppService {
     }
 
     async generateEnemyLogic(dataDTO: DataDTO): Promise<Building[]> {
+        console.log(dataDTO)
         /**
          * у игрока есть адрес базы и айди зоны
          * В базе данных лежат обьекты карты
