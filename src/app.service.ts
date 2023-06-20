@@ -433,7 +433,7 @@ export class AppService {
         return responseDTO
     }
 
-    async attackEnemyHandler(data: any): Promise<Building> {
+    async attackEnemyHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
             dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.enemyId)
@@ -447,7 +447,7 @@ export class AppService {
         return await this.attackEnemyLogic(dataDTO)
     }
 
-    async attackEnemyLogic(dataDTO: DataDTO): Promise<Building> {
+    async attackEnemyLogic(dataDTO: DataDTO): Promise<Building[]> {
         //запрос на атаку базы по айди
         //если обьект удален создаем новый с таким же айди
         //если обьект есть ставим статус "бой"
@@ -460,11 +460,10 @@ export class AppService {
         if (enemy.isBattle) {
             enemy = await this.createNewEnemy(dataDTO)
         }
-
         this.mapRepo.save(enemy)
 
-        console.log(JSON.stringify(enemy))
-        return enemy
+        // console.log(JSON.stringify(enemy))
+        return [enemy]
     }
 
 
@@ -489,7 +488,6 @@ export class AppService {
         if (buildings.length == 0) throw 'Базы не существует'
         return buildings[0]
     }
-
 }
 
 class Vector2 {
