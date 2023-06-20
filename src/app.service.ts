@@ -131,6 +131,7 @@ export class AppService {
         const startCoord = this.getChunkStartCoord(chunkId)
         const endCoord = this.getChunkEndCoord(chunkId)
 
+        console.log('--')
         console.log(JSON.stringify(startCoord))
         console.log(JSON.stringify(endCoord))
 
@@ -165,7 +166,7 @@ export class AppService {
         return arr
     }
 
-    private getChunkStartCoord(vector: Vector2): Vector2 {//ащиббка тут
+    private getChunkStartCoord(vector: Vector2): Vector2 {//ащиббка тут, не правильно определяются координаты чанков
         const x = vector.x - vector.x % this.getChunkSize()
         const y = vector.y - vector.y % this.getChunkSize()
         return new Vector2(x, y)
