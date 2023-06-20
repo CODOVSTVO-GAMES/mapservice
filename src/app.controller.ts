@@ -17,8 +17,8 @@ export class AppController {
         return await this.appService.generateEnemyResponser(data)
     }
 
-    // @EventPattern('attack_enemy')
-    // async attackEnemy(data: any): Promise<ResponseDTO> {
-    //     return await this.appService.mapGetResponser(data)
-    // }
+    @EventPattern('attack_enemy')
+    async attackEnemy(data: any): Promise<ResponseDTO> {
+        return await this.appService.attackEnemyResponser(data)
+    }
 }
