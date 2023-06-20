@@ -283,7 +283,6 @@ export class AppService {
     }
 
     async generateEnemyLogic(dataDTO: DataDTO): Promise<Building[]> {
-        console.log(dataDTO)
         /**
          * у игрока есть адрес базы и айди зоны
          * В базе данных лежат обьекты карты
@@ -373,7 +372,6 @@ export class AppService {
     }
 
     async createEnemy(type: string, level: number, stars: number, zone: string, coords: Vector2, owner: string): Promise<Building> {
-        console.log('Вызов создания врага')
         return await this.mapRepo.save(
             this.mapRepo.create(
                 {
@@ -455,15 +453,21 @@ export class AppService {
         console.log('-----------------------------------------------')
         console.log(dataDTO)
 
-        let enemy = (await this.getEnemy(dataDTO))
-
-        if (enemy.isBattle) {
-            enemy = await this.createNewEnemy(dataDTO)
+        if (dataDTO.taskStatus) {
+            this.mapRepo.createQueryBuilder().delete().from(Building).where("id = :id", { id: dataDTO.enemyId })
+            return []
         }
-        this.mapRepo.save(enemy)
+        else {
+            let enemy = (await this.getEnemy(dataDTO))
 
-        // console.log(JSON.stringify(enemy))
-        return [enemy]
+            if (enemy.isBattle) {
+                enemy = await this.createNewEnemy(dataDTO)
+            }
+            enemy.isBattle = true
+            this.mapRepo.save(enemy)
+
+            return [enemy]
+        }
     }
 
 
