@@ -6,7 +6,6 @@ import { Building } from './Models/Building';
 import { Between, Repository } from 'typeorm';
 import { LoggerService } from './logger/logger.service';
 import { RabbitMQService } from './rabbit/rabbit.servicve';
-import { min } from 'rxjs';
 
 
 @Injectable()
@@ -396,7 +395,7 @@ export class AppService {
     private getRandomBattleTime() {
         const minTime = 10000
         const maxTime = 20000
-        return Math.random() * (maxTime - minTime) + minTime
+        return Math.abs(Math.random() * (maxTime - minTime) + minTime)
 
     }
 
