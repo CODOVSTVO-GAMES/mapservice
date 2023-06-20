@@ -6,6 +6,8 @@ import { Building } from './Models/Building';
 import { Between, Repository } from 'typeorm';
 import { LoggerService } from './logger/logger.service';
 import { RabbitMQService } from './rabbit/rabbit.servicve';
+import { get } from 'http';
+import e from 'express';
 
 
 @Injectable()
@@ -52,7 +54,7 @@ export class AppService {
     async mapGetHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber)
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumberr, data.battleOwner)
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
                 throw 'Пришли пустые данные'
             }
@@ -130,10 +132,6 @@ export class AppService {
     private async getChunkBuildings(chunkId: Vector2, zone: string): Promise<Building[]> {
         const startCoord = this.getChunkStartCoord(chunkId)
         const endCoord = this.getChunkEndCoord(chunkId)
-
-        console.log('--')
-        console.log(JSON.stringify(startCoord))
-        console.log(JSON.stringify(endCoord))
 
         const buildings = await this.mapRepo.find({
             where: {
@@ -271,7 +269,7 @@ export class AppService {
     async generateEnemyHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber)
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumberr, data.battleOwner)
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y) || dataDTO.level == undefined) {
                 throw 'Пришли пустые данные'
             }
@@ -310,12 +308,18 @@ export class AppService {
         const createBattlesNumber = dataDTO.battlesNumber - battleFits
 
         for (let l = 0; l < createBattlesNumber; l++) {
-            const type = this.createEnemyType()
-            const stars = this.createEnemyStars()
-            const coords = await this.generateFreeCoordinatesBetveen(dataDTO.x, dataDTO.y)
-            buildings.push(await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords))
+            const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
+            const enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
+            buildings.push(enemy)
         }
         return buildings
+    }
+
+    private async createNewEnemy(baseCoords: Vector2, level: number, zone: string): Promise<Building> {
+        const type = this.createEnemyType()
+        const stars = this.createEnemyStars()
+        const coords = await this.generateFreeCoordinatesBetveen(baseCoords.x, baseCoords.y)
+        return await this.createEnemy(type, level, stars, zone, coords)
     }
 
     private generateNumberBetven(x: number): number {
@@ -381,6 +385,90 @@ export class AppService {
             )
         )
     }
+
+
+    //--------------------
+    async attackEnemyResponser(data: any): Promise<ResponseDTO> {
+        const responseDTO = new ResponseDTO()
+        let status = 200
+
+        try {
+            const response = await this.attackEnemyHandler(data)
+            responseDTO.data = response
+        }
+        catch (e) {
+            if (e == 'sessions not found' || e == 'session expired') {
+                status = 403//перезапуск клиента
+            }
+            else if (e == 'too many requests') {
+                status = 429//повторить запрос позже
+            } else if (e == 'parsing data error') {
+                status = 400 //сервер не знает что делать
+            } else {
+                status = 400
+            }
+            console.log("Ошибка " + e)
+        }
+        responseDTO.status = status
+        return responseDTO
+    }
+
+    async attackEnemyHandler(data: any): Promise<Building> {
+        let dataDTO
+        try {
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner)
+            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
+                throw 'Пришли пустые данные'
+            }
+        } catch (e) {
+            throw "parsing data error"
+        }
+
+        return await this.attackEnemyLogic(dataDTO)
+    }
+
+    async attackEnemyLogic(dataDTO: DataDTO): Promise<Building> {
+        //запрос на атаку базы в координатах
+        //если никто не атакует записываем айди атакующео
+        //если кто то атакует - спавним рядом, ставим айди атакующего
+        //возвращаем обьект который атакуем
+
+        let enemy = (await this.getEnemy(dataDTO))
+
+        if (enemy.battleOwner != 'empty') {
+            const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
+            enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
+        }
+        enemy.battleOwner = dataDTO.accountId
+        this.mapRepo.save(enemy)
+
+        return enemy
+    }
+
+
+    async getEnemy(dataDTO: DataDTO): Promise<Building> {
+        let enemy: Building
+        try {
+            enemy = await this.getEnemyById(dataDTO.enemyId)
+        }
+        catch (e) {
+            console.log('врага нет? cоздаем нового' + e)
+            const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
+            enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
+        }
+        return enemy
+    }
+
+    async getEnemyById(id: number): Promise<Building> {
+        const buildings = await this.mapRepo.find({
+            where: {
+                id: id
+            }
+        })
+        if (buildings.length == 0) throw 'Базы не существует'
+        return buildings[0]
+    }
+
 }
 
 class Vector2 {
