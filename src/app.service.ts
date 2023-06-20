@@ -6,6 +6,7 @@ import { Building } from './Models/Building';
 import { Between, Repository } from 'typeorm';
 import { LoggerService } from './logger/logger.service';
 import { RabbitMQService } from './rabbit/rabbit.servicve';
+import { min } from 'rxjs';
 
 
 @Injectable()
@@ -52,7 +53,7 @@ export class AppService {
     async mapGetHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumberr, data.battleOwner)
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumberr, data.battleOwner, data.enemyId)
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
                 throw 'Пришли пустые данные'
             }
@@ -197,7 +198,8 @@ export class AppService {
                     x: freeCoordinates.x,
                     y: freeCoordinates.y,
                     expiration: Date.now() + 2592000000, //30 дней
-                    level: level
+                    level: level,
+                    isBattle: false
                 }
             )
         )
@@ -270,7 +272,7 @@ export class AppService {
     async generateEnemyHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner)
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.enemyId)
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y) || dataDTO.level == undefined) {
                 throw 'Пришли пустые данные'
             }
@@ -310,7 +312,6 @@ export class AppService {
         const createBattlesNumber = dataDTO.battlesNumber - battleFits
 
         for (let l = 0; l < createBattlesNumber; l++) {
-            const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
             const enemy = await this.createNewEnemy(dataDTO)
             buildings.push(enemy)
         }
@@ -384,96 +385,111 @@ export class AppService {
                     x: coords.x,
                     y: coords.y,
                     expiration: Date.now() + 600000,//10 минут
-                    owner: owner
+                    owner: owner,
+                    battleTime: this.getRandomBattleTime(),
+                    isBattle: false
                 }
             )
         )
     }
 
+    private getRandomBattleTime() {
+        const minTime = 10000
+        const maxTime = 20000
+        return Math.random() * (maxTime - minTime) + minTime
+
+    }
+
 
     //--------------------
-    // async attackEnemyResponser(data: any): Promise<ResponseDTO> {
-    //     const responseDTO = new ResponseDTO()
-    //     let status = 200
-
-    //     try {
-    //         const response = await this.attackEnemyHandler(data)
-    //         responseDTO.data = response
-    //     }
-    //     catch (e) {
-    //         if (e == 'sessions not found' || e == 'session expired') {
-    //             status = 403//перезапуск клиента
-    //         }
-    //         else if (e == 'too many requests') {
-    //             status = 429//повторить запрос позже
-    //         } else if (e == 'parsing data error') {
-    //             status = 400 //сервер не знает что делать
-    //         } else {
-    //             status = 400
-    //         }
-    //         console.log("Ошибка " + e)
-    //     }
-    //     responseDTO.status = status
-    //     return responseDTO
-    // }
-
-    // async attackEnemyHandler(data: any): Promise<Building> {
-    //     let dataDTO
-    //     try {
-    //         dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner)
-    //         if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
-    //             throw 'Пришли пустые данные'
-    //         }
-    //     } catch (e) {
-    //         throw "parsing data error"
-    //     }
-
-    //     return await this.attackEnemyLogic(dataDTO)
-    // }
-
-    // async attackEnemyLogic(dataDTO: DataDTO): Promise<Building> {
-    //     //запрос на атаку базы в координатах
-    //     //если никто не атакует записываем айди атакующео
-    //     //если кто то атакует - спавним рядом, ставим айди атакующего
-    //     //возвращаем обьект который атакуем
-
-    //     // console.log('-----------------------------------------------')
-    //     // console.log(dataDTO)
-    //     // const enemy = (await this.getEnemy(dataDTO))
-
-    //     // if (enemy.battleOwner != 'empty') {
-    //     //     const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
-    //     //     enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
-    //     // }
-    //     // enemy.battleOwner = dataDTO.accountId
-    //     // this.mapRepo.save(enemy)
-    //     // console.log(JSON.stringify(enemy))
-    //     // return 
-    // }
 
 
-    // async getEnemy(dataDTO: DataDTO): Promise<Building> {
-    //     let enemy: Building
-    //     try {
-    //         enemy = await this.getEnemyById(dataDTO.enemyId)
-    //     }
-    //     catch (e) {
-    //         console.log('врага нет? cоздаем нового' + e)
-    //         const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
-    //         enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
-    //     }
-    //     return enemy
-    // }
 
-    // async getEnemyById(id: number): Promise<Building> {
-    //     const buildings = await this.mapRepo.find({
-    //         where: {
-    //             id: id
-    //         }
-    //     })
-    //     if (buildings.length == 0) throw 'Базы не существует'
-    //     return buildings[0]
-    // }
+
+
+    //--------------------
+
+    async attackEnemyResponser(data: any): Promise<ResponseDTO> {
+        const responseDTO = new ResponseDTO()
+        let status = 200
+
+        try {
+            const response = await this.attackEnemyHandler(data)
+            responseDTO.data = response
+        }
+        catch (e) {
+            if (e == 'sessions not found' || e == 'session expired') {
+                status = 403//перезапуск клиента
+            }
+            else if (e == 'too many requests') {
+                status = 429//повторить запрос позже
+            } else if (e == 'parsing data error') {
+                status = 400 //сервер не знает что делать
+            } else {
+                status = 400
+            }
+            console.log("Ошибка " + e)
+        }
+        responseDTO.status = status
+        return responseDTO
+    }
+
+    async attackEnemyHandler(data: any): Promise<Building> {
+        let dataDTO
+        try {
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.enemyId)
+            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
+                throw 'Пришли пустые данные'
+            }
+        } catch (e) {
+            throw "parsing data error"
+        }
+
+        return await this.attackEnemyLogic(dataDTO)
+    }
+
+    async attackEnemyLogic(dataDTO: DataDTO): Promise<Building> {
+        //запрос на атаку базы по айди
+        //если обьект удален создаем новый с таким же айди
+        //если обьект есть ставим статус "бой"
+
+        console.log('-----------------------------------------------')
+        console.log(dataDTO)
+
+        let enemy = (await this.getEnemy(dataDTO))
+
+        if (enemy.isBattle) {
+            enemy = await this.createNewEnemy(dataDTO)
+        }
+
+        this.mapRepo.save(enemy)
+
+        console.log(JSON.stringify(enemy))
+        return enemy
+    }
+
+
+    async getEnemy(dataDTO: DataDTO): Promise<Building> {
+        let enemy: Building
+        try {
+            enemy = await this.getEnemyById(dataDTO.enemyId)
+        }
+        catch (e) {
+            console.log('врага нет? cоздаем нового' + e)
+            enemy = await this.createNewEnemy(dataDTO)
+        }
+        return enemy
+    }
+
+    async getEnemyById(id: number): Promise<Building> {
+        const buildings = await this.mapRepo.find({
+            where: {
+                id: id
+            }
+        })
+        if (buildings.length == 0) throw 'Базы не существует'
+        return buildings[0]
+    }
 
 }
 

@@ -6,9 +6,10 @@ export class DataDTO {
     level: number
     battlesNumber: number
     battleOwner: string
+    enemyId: number
 
 
-    constructor(accountId: string, zone: string, x: number, y: number, level: number, battlesNumber: number, battleOwner: string) {
+    constructor(accountId: string, zone: string, x: number, y: number, level: number, battlesNumber: number, battleOwner: string, enemyId: number) {
         this.accountId = accountId
         this.zone = zone
         this.x = x
@@ -16,5 +17,6 @@ export class DataDTO {
         this.level = level
         this.battlesNumber = battlesNumber
         this.battleOwner = battleOwner
+        this.enemyId = enemyId
     }
 }

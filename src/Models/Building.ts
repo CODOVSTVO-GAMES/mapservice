@@ -31,4 +31,10 @@ export class Building {
 
     @Column({ nullable: true })
     owner: string
+
+    @Column({ nullable: true })
+    battleTime: number
+
+    @Column()
+    isBattle: boolean
 }
