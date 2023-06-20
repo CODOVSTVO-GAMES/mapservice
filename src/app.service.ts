@@ -136,8 +136,8 @@ export class AppService {
         const buildings = await this.mapRepo.find({
             where: {
                 zone: zone,
-                x: Between(startCoord.x - 1, endCoord.x - 1),
-                y: Between(startCoord.y - 1, endCoord.y - 1)
+                x: Between(startCoord.x, endCoord.x),
+                y: Between(startCoord.y, endCoord.y)
             }
         })
         return buildings
