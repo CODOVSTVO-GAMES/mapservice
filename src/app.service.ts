@@ -456,7 +456,7 @@ export class AppService {
 
         if (dataDTO.taskStatus) {
             console.log('удалить' + dataDTO.enemyId)
-            this.mapRepo.createQueryBuilder().delete().from(Building).where("id = :id", { id: dataDTO.enemyId })
+            this.mapRepo.delete(dataDTO.enemyId)
             return []
         }
         else {
