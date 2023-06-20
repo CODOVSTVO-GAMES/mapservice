@@ -86,7 +86,6 @@ export class AppService {
         else {
             coords = new Vector2(dataDTO.x, dataDTO.y)
         }
-        console.log('hm' + coords.x + ' ' + coords.y)
         return await this.findObjects(coords, zone)
     }
 
@@ -158,7 +157,6 @@ export class AppService {
         arr.push(new Vector2(chunk.x + 1, chunk.y + 1))
         arr.push(new Vector2(chunk.x - 1, chunk.y - 1))
         arr.push(new Vector2(chunk.x + 1, chunk.y - 1))
-        console.log(JSON.stringify(arr))
         return arr
     }
 
@@ -293,7 +291,8 @@ export class AppService {
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
         let battleFits = 0
-        console.log('2')
+        console.log('2' + buildings.length)
+
         for (let l = 0; l < buildings.length; l++) {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
@@ -313,7 +312,7 @@ export class AppService {
             const enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
             buildings.push(enemy)
         }
-        console.log('5')
+        console.log('5' + buildings.length)
         return buildings
     }
 
