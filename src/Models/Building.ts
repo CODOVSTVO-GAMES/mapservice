@@ -30,5 +30,5 @@ export class Building {
     expiration: number
 
     @Column({ nullable: true })
-    battleOwner: string
+    owner: string
 }
