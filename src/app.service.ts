@@ -163,6 +163,7 @@ export class AppService {
         arr.push(new Vector2(chunk.x + 1, chunk.y + 1))
         arr.push(new Vector2(chunk.x - 1, chunk.y - 1))
         arr.push(new Vector2(chunk.x + 1, chunk.y - 1))
+        console.log(JSON.stringify(arr))
         return arr
     }
 
