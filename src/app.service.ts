@@ -268,6 +268,7 @@ export class AppService {
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y) || dataDTO.level == undefined) {
                 throw 'Пришли пустые данные'
             }
+            if (Number.isNaN(dataDTO.battlesNumber)) { dataDTO.battlesNumber = 1 }
         } catch (e) {
             throw "parsing data error"
         }
