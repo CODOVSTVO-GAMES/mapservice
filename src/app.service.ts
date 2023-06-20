@@ -196,7 +196,7 @@ export class AppService {
                     type: 'base',
                     x: freeCoordinates.x,
                     y: freeCoordinates.y,
-                    expiration: Date.now() + 2592000000, //30 дней
+                    expiration: Date.now() + 3600000,//2592000000, //30 дней
                     level: level,
                     isBattle: false
                 }

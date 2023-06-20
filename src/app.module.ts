@@ -7,9 +7,10 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { Building } from './Models/Building';
 import { LoggerModule } from './logger/logger.module';
 import { RabbitModule } from './rabbit/rabbit.module';
+import { AutoTasksModule } from './auto-tasks/auto-tasks.module';
 
 @Module({
-  imports: [PostgresModule, TypeOrmModule.forFeature([Building]), ScheduleModule.forRoot(), LoggerModule, RabbitModule],
+  imports: [PostgresModule, TypeOrmModule.forFeature([Building]), ScheduleModule.forRoot(), LoggerModule, RabbitModule, AutoTasksModule],
   controllers: [AppController],
   providers: [AppService],
 })
