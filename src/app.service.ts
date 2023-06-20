@@ -122,6 +122,7 @@ export class AppService {
             const newBuildings = await this.getChunkBuildings(chunkId, zone)
             buildings = buildings.concat(newBuildings)
         }
+        console.log('Найдено ' + buildings.length)
         return buildings
     }
 
@@ -292,12 +293,13 @@ export class AppService {
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
         let battleFits = 0
-        console.log('2' + buildings.length)
+        console.log('2 ' + buildings.length)
 
         for (let l = 0; l < buildings.length; l++) {
             if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].level == dataDTO.level) {
                 battleFits += 1
                 if (battleFits >= dataDTO.battlesNumber) {
+                    console.log('22 ' + buildings.length)
                     return buildings
                 }
             }
@@ -313,7 +315,7 @@ export class AppService {
             const enemy = await this.createNewEnemy(baseCoords, dataDTO.level, dataDTO.zone)
             buildings.push(enemy)
         }
-        console.log('5' + buildings.length)
+        console.log('5 ' + buildings.length)
         return buildings
     }
 
