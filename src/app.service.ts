@@ -429,6 +429,8 @@ export class AppService {
         //если кто то атакует - спавним рядом, ставим айди атакующего
         //возвращаем обьект который атакуем
 
+        console.log('-----------------------------------------------')
+        console.log(dataDTO)
         let enemy = (await this.getEnemy(dataDTO))
 
         if (enemy.battleOwner != 'empty') {
@@ -437,7 +439,7 @@ export class AppService {
         }
         enemy.battleOwner = dataDTO.accountId
         this.mapRepo.save(enemy)
-
+        console.log(JSON.stringify(enemy))
         return enemy
     }
 
