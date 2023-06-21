@@ -121,7 +121,8 @@ export class AppService {
             buildings = buildings.concat(newBuildings)
         }
 
-        return buildings
+
+        return this.deleteRecurring(buildings)
     }
 
     private async getChunkBuildings(chunkId: Vector2, zone: string): Promise<Building[]> {
@@ -137,6 +138,29 @@ export class AppService {
         })
         return buildings
     }
+
+    deleteRecurring(arr: Building[]): Building[] {
+        const indexes: number[] = []
+        const newArr: Building[] = []
+        for (let l = 0; l < arr.length; l++) {
+            if (!this.isBuildingInArray(arr[l], indexes)) {
+                indexes.push(arr[l].id)
+                newArr.push(arr[l])
+            }
+        }
+        return newArr
+    }
+
+    isBuildingInArray(building: Building, indexes: number[]): boolean {
+        for (let i = 0; i < indexes.length; i++) {
+            if (indexes[i] == building.id) {
+                return true
+            }
+        }
+        return false
+    }
+
+
 
     private getChunkId(baseCoords: Vector2): Vector2 {
         const xChunk = Math.floor(baseCoords.x / this.getChunkSize())
