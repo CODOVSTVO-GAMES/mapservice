@@ -62,7 +62,5 @@ export class AutoTasksService {
                 this.mapRepo.delete(battles[l].id)
             }
         }
-
     }
-
 }

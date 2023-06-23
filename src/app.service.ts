@@ -483,14 +483,15 @@ export class AppService {
             task.isBattle = true
             this.mapRepo.save(task)
         }
+        else if (dataDTO.taskStatus == 2) {
+        }
 
 
         //если статус победа
         //удаляем обьект 
-        else if (dataDTO.taskStatus == 2) {
+        else if (dataDTO.taskStatus == 3) {
             this.mapRepo.delete(dataDTO.taskId)
         }
-
 
         //если статус поражение
         //ставим статус не активен
