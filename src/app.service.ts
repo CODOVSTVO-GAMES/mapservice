@@ -462,7 +462,7 @@ export class AppService {
     async attackEnemyHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battleOwner, data.taskId, data.taskStatus)
+            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.taskId, data.taskStatus)
             if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
                 throw 'Пришли пустые данные'
             }
