@@ -266,12 +266,12 @@ export class AppService {
 
     //-----------------------------------------------------------------------
 
-    async generateEnemyResponser(data: any): Promise<ResponseDTO> {
+    async getEnemyResponser(data: any): Promise<ResponseDTO> {
         const responseDTO = new ResponseDTO()
         let status = 200
 
         try {
-            const response = await this.generateEnemyHandler(data)
+            const response = await this.getEnemyResponserHandler(data)
             responseDTO.data = response
         }
         catch (e) {
@@ -291,8 +291,7 @@ export class AppService {
         return responseDTO
     }
 
-
-    async generateEnemyHandler(data: any): Promise<Building[]> {
+    async getEnemyResponserHandler(data: any): Promise<Building[]> {
         let dataDTO
         try {
             dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.taskId)
@@ -303,10 +302,10 @@ export class AppService {
             throw "parsing data error"
         }
 
-        return await this.generateEnemyLogic(dataDTO)
+        return await this.getEnemyResponserLogic(dataDTO)
     }
 
-    async generateEnemyLogic(dataDTO: DataDTO): Promise<Building[]> {
+    async getEnemyResponserLogic(dataDTO: DataDTO): Promise<Building[]> {
         /**
          * у игрока есть адрес базы и айди зоны
          * В базе данных лежат обьекты карты
@@ -406,7 +405,7 @@ export class AppService {
                     stars: stars,
                     x: coords.x,
                     y: coords.y,
-                    expiration: Date.now() + 600000,//10 минут
+                    expiration: Date.now() + 1200000,//20 минут
                     owner: owner,
                     battleTime: this.getRandomBattleTime(),
                     isBattle: false
@@ -472,34 +471,49 @@ export class AppService {
     }
 
     async attackEnemyLogic(dataDTO: DataDTO): Promise<Building[]> {
+        //сообщение об атаке врага. Начало, победа, поражение
+
+        const task = await this.getEnemyById(dataDTO.taskId)
+
+        //если статус начало
         //находим обьект по айди
-        //если статус тру удаляем его
-        //если статус фолс ставим статус фолс
+        //ставим статус активен
 
-        if (dataDTO.taskStatus) {
-            console.log('удалить' + dataDTO.enemyId)
-            this.mapRepo.delete(dataDTO.enemyId)
+        if (dataDTO.taskStatus == 1) {
+            task.isBattle = true
+            this.mapRepo.save(task)
         }
+
+
+        //если статус победа
+        //удаляем обьект 
+        else if (dataDTO.taskStatus == 2) {
+            this.mapRepo.delete(dataDTO.taskId)
+        }
+
+
+        //если статус поражение
+        //ставим статус не активен
         else {
-            const enemy = (await this.getEnemy(dataDTO))
-            enemy.isBattle = false
-            this.mapRepo.save(enemy)
+            task.isBattle = false
+            this.mapRepo.save(task)
         }
-        return await this.generateEnemyLogic(dataDTO)
+
+        return []
     }
 
 
-    async getEnemy(dataDTO: DataDTO): Promise<Building> {
-        let enemy: Building
-        try {
-            enemy = await this.getEnemyById(dataDTO.enemyId)
-        }
-        catch (e) {
-            console.log('врага нет? cоздаем нового' + e)
-            enemy = await this.createNewEnemy(dataDTO)
-        }
-        return enemy
-    }
+    // async getEnemy(dataDTO: DataDTO): Promise<Building> {
+    //     let enemy: Building
+    //     try {
+    //         enemy = await this.getEnemyById(dataDTO.taskId)
+    //     }
+    //     catch (e) {
+    //         console.log('врага нет? cоздаем нового' + e)
+    //         enemy = await this.createNewEnemy(dataDTO)
+    //     }
+    //     return enemy
+    // }
 
     async getEnemyById(id: number): Promise<Building> {
         const buildings = await this.mapRepo.find({

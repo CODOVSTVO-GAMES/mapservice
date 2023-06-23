@@ -30,22 +30,22 @@ export class AutoTasksService {
 
 
 
-    @Cron(CronExpression.EVERY_5_MINUTES)
-    async deleteOldTaskPersonal() {
-        const battles = await this.mapRepo.find({
-            where: {
-                type: 'taskPersonal'
-            }
-        })
+    // @Cron(CronExpression.EVERY_5_MINUTES)
+    // async deleteOldTaskPersonal() {
+    //     const battles = await this.mapRepo.find({
+    //         where: {
+    //             type: 'taskPersonal'
+    //         }
+    //     })
 
-        const date = Date.now()
-        for (let l = 0; l < battles.length; l++) {
-            if (battles[l].expiration > date) {
-                this.mapRepo.delete(battles[l].id)
-            }
-        }
+    //     const date = Date.now()
+    //     for (let l = 0; l < battles.length; l++) {
+    //         if (battles[l].expiration > date) {
+    //             this.mapRepo.delete(battles[l].id)
+    //         }
+    //     }
 
-    }
+    // }
 
     @Cron(CronExpression.EVERY_5_MINUTES)
     async deleteOldTaskSalvation() {
@@ -56,8 +56,9 @@ export class AutoTasksService {
         })
 
         const date = Date.now()
+
         for (let l = 0; l < battles.length; l++) {
-            if (battles[l].expiration > date) {
+            if (battles[l].expiration > date && !battles[l].isBattle) {
                 this.mapRepo.delete(battles[l].id)
             }
         }
