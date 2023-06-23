@@ -367,6 +367,7 @@ export class AppService {
     }
 
     createEnemyType() {
+        return 'taskSalvation'
         const random = Math.floor(Math.random() * 100);
         if (random < 60) {
             return 'taskSalvation'
