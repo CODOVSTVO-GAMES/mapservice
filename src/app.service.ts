@@ -316,13 +316,16 @@ export class AppService {
          * если меньше то доспавниваем нужное число
          */
 
+        console.log('----')
+        console.log(dataDTO)
+
         const baseCoords = new Vector2(dataDTO.x, dataDTO.y)
         const buildings = await this.findObjects(baseCoords, dataDTO.zone)
 
         let battleFits = 0
 
         for (let l = 0; l < buildings.length; l++) {
-            if ((buildings[l].type == 'taskSalvation' || buildings[l].type == 'taskPersonal') && buildings[l].owner == dataDTO.accountId) {
+            if ((buildings[l].type == 'taskSalvation') && buildings[l].owner == dataDTO.accountId) {
                 battleFits += 1
                 if (battleFits >= dataDTO.battlesNumber) {
                     return buildings
