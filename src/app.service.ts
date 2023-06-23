@@ -476,21 +476,16 @@ export class AppService {
         //если статус тру удаляем его
         //если статус фолс ставим статус фолс
 
-
-        console.log('-----------------------------------------------')
-        console.log(dataDTO)
-
         if (dataDTO.taskStatus) {
             console.log('удалить' + dataDTO.enemyId)
             this.mapRepo.delete(dataDTO.enemyId)
-            return []
         }
         else {
             const enemy = (await this.getEnemy(dataDTO))
             enemy.isBattle = false
             this.mapRepo.save(enemy)
-            return [enemy]
         }
+        return await this.generateEnemyLogic(dataDTO)
     }
 
 
