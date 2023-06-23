@@ -471,9 +471,10 @@ export class AppService {
     }
 
     async attackEnemyLogic(dataDTO: DataDTO): Promise<Building[]> {
-        //запрос на атаку базы по айди
-        //если обьект удален создаем новый с таким же айди
-        //если обьект есть ставим статус "бой"
+        //находим обьект по айди
+        //если статус тру удаляем его
+        //если статус фолс ставим статус фолс
+
 
         console.log('-----------------------------------------------')
         console.log(dataDTO)
@@ -484,14 +485,9 @@ export class AppService {
             return []
         }
         else {
-            let enemy = (await this.getEnemy(dataDTO))
-
-            if (enemy.isBattle) {
-                enemy = await this.createNewEnemy(dataDTO)
-            }
-            enemy.isBattle = true
+            const enemy = (await this.getEnemy(dataDTO))
+            enemy.isBattle = false
             this.mapRepo.save(enemy)
-
             return [enemy]
         }
     }
