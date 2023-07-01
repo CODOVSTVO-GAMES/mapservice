@@ -15,22 +15,22 @@ export class AppService {
     private mapSizeChunks = 32
 
     constructor(
-        @InjectRepository(Building) private mapRepo: Repository<Building>
+        @InjectRepository(Building) private mapRepo: Repository<Building>,
+        private readonly loggerService: LoggerService,
+        private readonly rabbitService: RabbitMQService
     ) { }
-
-    @Inject(LoggerService)
-    private readonly loggerService: LoggerService
-
-    @Inject(RabbitMQService)
-    private readonly rabbitService: RabbitMQService
 
     async mapGetResponser(data: any): Promise<ResponseDTO> {
         const responseDTO = new ResponseDTO()
         let status = 200
 
         try {
-            const response = await this.mapGetHandler(data)
-            responseDTO.data = response
+            const dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumberr, data.battleOwner, data.taskId)
+            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
+                throw 'Пришли пустые данные'
+            }
+
+            responseDTO.data = await this.mapGetLogic(dataDTO)
         }
         catch (e) {
             if (e == 'sessions not found' || e == 'session expired') {
@@ -49,19 +49,6 @@ export class AppService {
         return responseDTO
     }
 
-    async mapGetHandler(data: any): Promise<Building[]> {
-        let dataDTO
-        try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumberr, data.battleOwner, data.taskId)
-            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
-                throw 'Пришли пустые данные'
-            }
-        } catch (e) {
-            throw "parsing data error"
-        }
-
-        return await this.mapGetLogic(dataDTO)
-    }
 
     async mapGetLogic(dataDTO: DataDTO): Promise<Building[]> {
         /**
@@ -271,7 +258,12 @@ export class AppService {
         let status = 200
 
         try {
-            const response = await this.getEnemyResponserHandler(data)
+            const dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.taskId)
+            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y) || dataDTO.level == undefined) {
+                throw 'Пришли пустые данные'
+            }
+
+            const response = await this.getEnemyResponserLogic(dataDTO)
             responseDTO.data = response
         }
         catch (e) {
@@ -291,19 +283,6 @@ export class AppService {
         return responseDTO
     }
 
-    async getEnemyResponserHandler(data: any): Promise<Building[]> {
-        let dataDTO
-        try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.taskId)
-            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y) || dataDTO.level == undefined) {
-                throw 'Пришли пустые данные'
-            }
-        } catch (e) {
-            throw "parsing data error"
-        }
-
-        return await this.getEnemyResponserLogic(dataDTO)
-    }
 
     async getEnemyResponserLogic(dataDTO: DataDTO): Promise<Building[]> {
         /**
@@ -439,8 +418,12 @@ export class AppService {
         let status = 200
 
         try {
-            const response = await this.attackEnemyHandler(data)
-            responseDTO.data = response
+            const dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.taskId, data.taskStatus)
+            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
+                throw 'Пришли пустые данные'
+            }
+
+            responseDTO.data = await this.attackEnemyLogic(dataDTO)
         }
         catch (e) {
             if (e == 'sessions not found' || e == 'session expired') {
@@ -457,20 +440,6 @@ export class AppService {
         }
         responseDTO.status = status
         return responseDTO
-    }
-
-    async attackEnemyHandler(data: any): Promise<Building[]> {
-        let dataDTO
-        try {
-            dataDTO = new DataDTO(data.accountId, data.zone, data.x, data.y, data.level, data.battlesNumber, data.battleOwner, data.taskId, data.taskStatus)
-            if (Number.isNaN(dataDTO.x) || Number.isNaN(dataDTO.y)) {
-                throw 'Пришли пустые данные'
-            }
-        } catch (e) {
-            throw "parsing data error"
-        }
-
-        return await this.attackEnemyLogic(dataDTO)
     }
 
     async attackEnemyLogic(dataDTO: DataDTO): Promise<Building[]> {
@@ -505,19 +474,6 @@ export class AppService {
 
         return []
     }
-
-
-    // async getEnemy(dataDTO: DataDTO): Promise<Building> {
-    //     let enemy: Building
-    //     try {
-    //         enemy = await this.getEnemyById(dataDTO.taskId)
-    //     }
-    //     catch (e) {
-    //         console.log('врага нет? cоздаем нового' + e)
-    //         enemy = await this.createNewEnemy(dataDTO)
-    //     }
-    //     return enemy
-    // }
 
     async getEnemyById(id: number): Promise<Building> {
         const buildings = await this.mapRepo.find({
