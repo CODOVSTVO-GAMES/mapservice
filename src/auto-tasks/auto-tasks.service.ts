@@ -48,7 +48,7 @@ export class AutoTasksService {
         }
     }
 
-    @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_30_MINUTES)
     async spawnMine() {
         //получить список чанков
         //зайти в каждый чанк
@@ -77,4 +77,5 @@ export class AutoTasksService {
             }
         }
     }
+
 }
