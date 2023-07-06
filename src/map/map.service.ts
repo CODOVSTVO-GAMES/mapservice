@@ -252,7 +252,8 @@ export class MapService {
                     x: freeCord.x,
                     y: freeCord.y,
                     owner: 'empty',
-                    isBattle: false
+                    isBattle: false,
+                    expiration: Date.now() + 12000000,//20 минут
                 }
             )
         )
