@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
+import { BuildingTypes } from 'src/BuildingTypes';
 import { Building } from 'src/Models/Building';
-import { Repository } from 'typeorm';
+import { MapService } from 'src/map/map.service';
+import { Between, Repository } from 'typeorm';
 
 @Injectable()
 export class AutoTasksService {
 
     constructor(
-        @InjectRepository(Building) private mapRepo: Repository<Building>
+        @InjectRepository(Building) private mapRepo: Repository<Building>,
+        private readonly mapService: MapService
     ) { }
 
 
@@ -32,7 +35,7 @@ export class AutoTasksService {
     async deleteOldTaskSalvation() {
         const battles = await this.mapRepo.find({
             where: {
-                type: 'taskSalvation'
+                type: BuildingTypes.MISSION_SLAWATION
             }
         })
 
@@ -45,10 +48,33 @@ export class AutoTasksService {
         }
     }
 
+    @Cron(CronExpression.EVERY_MINUTE)
     async spawnMine() {
         //получить список чанков
         //зайти в каждый чанк
         //заспавнить там по n шахт
+        const chunks = this.mapService.getAllChunks()
 
+        for (let l = 0; l < chunks.length; l++) {
+            const startCoord = this.mapService.getChunkStartCoord(chunks[l])
+            const endCoord = this.mapService.getChunkEndCoord(chunks[l])
+            const mines = await this.mapRepo.find(
+                {
+                    where: {
+                        type: BuildingTypes.MINE,
+                        zone: 'testzone-',
+                        x: Between(startCoord.x, endCoord.x),
+                        y: Between(startCoord.y, endCoord.y)
+                    }
+                }
+            )
+            const spawnNum = 2 - mines.length
+
+            if (spawnNum > 0) {
+                for (let l = 0; l < spawnNum; l++) {
+                    await this.mapService.createMine(chunks[l])
+                }
+            }
+        }
     }
 }

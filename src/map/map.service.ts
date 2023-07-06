@@ -55,8 +55,6 @@ export class MapService {
                 noNullArr.push(arr[l])
             }
         }
-        console.log("chunks")
-        console.log(noNullArr)
 
         return noNullArr
     }
@@ -68,24 +66,6 @@ export class MapService {
         return await this.createEnemy(type, dataDTO.level, stars, dataDTO.zone, coords, dataDTO.accountId)
     }
 
-    async createEnemy(type: string, level: number, stars: number, zone: string, coords: Vector2, owner: string): Promise<Building> {
-        return await this.mapRepo.save(
-            this.mapRepo.create(
-                {
-                    zone: zone,
-                    type: type,
-                    level: level,
-                    stars: stars,
-                    x: coords.x,
-                    y: coords.y,
-                    expiration: Date.now() + 1200000,//20 минут
-                    owner: owner,
-                    battleTime: this.getRandomBattleTime(),
-                    isBattle: false
-                }
-            )
-        )
-    }
 
     private getRandomBattleTime() {
         const minTime = 10
@@ -242,6 +222,42 @@ export class MapService {
         )
     }
 
+    async createEnemy(type: string, level: number, stars: number, zone: string, coords: Vector2, owner: string): Promise<Building> {
+        return await this.mapRepo.save(
+            this.mapRepo.create(
+                {
+                    zone: zone,
+                    type: type,
+                    level: level,
+                    stars: stars,
+                    x: coords.x,
+                    y: coords.y,
+                    expiration: Date.now() + 1200000,//20 минут
+                    owner: owner,
+                    battleTime: this.getRandomBattleTime(),
+                    isBattle: false
+                }
+            )
+        )
+    }
+
+    async createMine(coords: Vector2): Promise<Building> {
+        const freeCord = await this.generateFreeCoordinatesByChunk(coords)
+        return await this.mapRepo.save(
+            this.mapRepo.create(
+                {
+                    zone: 'testzone-',
+                    type: BuildingTypes.MINE,
+                    level: 1,
+                    x: freeCord.x,
+                    y: freeCord.y,
+                    owner: 'empty',
+                    isBattle: false
+                }
+            )
+        )
+    }
+
     private generateRandomCoordinate() {
         return Math.floor(Math.random() * this.MAPSIZESELLS / this.MAPSIZECHUNKS * 2)
     }
@@ -257,6 +273,26 @@ export class MapService {
         }
     }
 
+    private generateRandomCoordinateByChunk(chunk: Vector2): Vector2 {
+        const startCoord = this.getChunkStartCoord(chunk)
+        const endCoord = this.getChunkEndCoord(chunk)
+
+        const xCoord = Math.floor(Math.random() * (endCoord.x - startCoord.x) + startCoord.x)
+        const yCoord = Math.floor(Math.random() * (endCoord.y - startCoord.y) + startCoord.y)
+
+        return new Vector2(xCoord, yCoord)
+    }
+
+    async generateFreeCoordinatesByChunk(chunk: Vector2): Promise<Vector2> {
+        const coord = this.generateRandomCoordinateByChunk(chunk)
+        if (await this.isCoordinatesFree(coord.x, coord.y)) {
+            return coord
+        }
+        else {
+            return await this.generateFreeCoordinatesByChunk(chunk)
+        }
+    }
+
     private async isCoordinatesFree(x: number, y: number): Promise<boolean> {
         const result = await this.mapRepo.find({
             where: {
@@ -269,6 +305,17 @@ export class MapService {
         } else {
             return true
         }
+    }
+
+    public getAllChunks() {
+        //двумя циклами добавить в массив все координаты
+        const arr = []
+        for (let l = 0; l < this.MAPSIZECHUNKS; l++) {
+            for (let i = 0; i < this.MAPSIZECHUNKS; i++) {
+                arr.push(new Vector2(l, i))
+            }
+        }
+        return arr
     }
 }
 
