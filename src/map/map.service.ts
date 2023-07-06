@@ -48,10 +48,17 @@ export class MapService {
         arr.push(new Vector2(chunk.x + 1, chunk.y + 1))
         arr.push(new Vector2(chunk.x - 1, chunk.y - 1))
         arr.push(new Vector2(chunk.x + 1, chunk.y - 1))
-        console.log("chunks")
-        console.log(arr)
 
-        return arr
+        const noNullArr = []
+        for (let l = 0; l < arr.length; l++) {
+            if (arr[l].x >= 0 && arr[l].y >= 0) {
+                noNullArr.push(arr[l])
+            }
+        }
+        console.log("chunks")
+        console.log(noNullArr)
+
+        return noNullArr
     }
 
     public async createNewEnemy(dataDTO: DataDTO): Promise<Building> {
