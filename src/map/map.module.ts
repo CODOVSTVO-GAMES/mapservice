@@ -3,6 +3,7 @@ import { MapService } from './map.service';
 
 @Global()
 @Module({
-    exports: [MapService]
+    exports: [MapService],
+    providers: [MapService]
 })
 export class MapModule { }
