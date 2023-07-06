@@ -280,6 +280,9 @@ export class MapService {
 
         const xCoord = Math.floor(Math.random() * (endCoord.x - startCoord.x) + startCoord.x)
         const yCoord = Math.floor(Math.random() * (endCoord.y - startCoord.y) + startCoord.y)
+        console.log('сгенерировано')
+        console.log(chunk)
+        console.log(new Vector2(xCoord, yCoord))
 
         return new Vector2(xCoord, yCoord)
     }

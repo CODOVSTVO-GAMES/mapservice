@@ -54,7 +54,6 @@ export class AutoTasksService {
         //зайти в каждый чанк
         //заспавнить там по n шахт
         const chunks = this.mapService.getAllChunks()
-        console.log(chunks)
 
         for (let l = 0; l < chunks.length; l++) {
             const startCoord = this.mapService.getChunkStartCoord(chunks[l])
