@@ -71,7 +71,7 @@ export class AutoTasksService {
             const spawnNum = 2 - mines.length
 
             if (spawnNum > 0) {
-                for (let l = 0; l < spawnNum; l++) {
+                for (let i = 0; i < spawnNum; i++) {
                     await this.mapService.createMine(chunks[l])
                 }
             }
