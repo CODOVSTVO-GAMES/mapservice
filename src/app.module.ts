@@ -8,11 +8,13 @@ import { Building } from './Models/Building';
 import { LoggerModule } from './logger/logger.module';
 import { RabbitModule } from './rabbit/rabbit.module';
 import { AutoTasksModule } from './auto-tasks/auto-tasks.module';
+import { MapService } from './map/map.service';
+import { MapModule } from './map/map.module';
 
 @Module({
-  imports: [PostgresModule, TypeOrmModule.forFeature([Building]), ScheduleModule.forRoot(), LoggerModule, RabbitModule, AutoTasksModule],
+  imports: [PostgresModule, TypeOrmModule.forFeature([Building]), ScheduleModule.forRoot(), LoggerModule, RabbitModule, AutoTasksModule, MapModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MapService],
 })
 export class AppModule {
 }

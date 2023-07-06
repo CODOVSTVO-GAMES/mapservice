@@ -28,25 +28,6 @@ export class AutoTasksService {
         }
     }
 
-
-
-    // @Cron(CronExpression.EVERY_5_MINUTES)
-    // async deleteOldTaskPersonal() {
-    //     const battles = await this.mapRepo.find({
-    //         where: {
-    //             type: 'taskPersonal'
-    //         }
-    //     })
-
-    //     const date = Date.now()
-    //     for (let l = 0; l < battles.length; l++) {
-    //         if (battles[l].expiration > date) {
-    //             this.mapRepo.delete(battles[l].id)
-    //         }
-    //     }
-
-    // }
-
     @Cron(CronExpression.EVERY_5_MINUTES)
     async deleteOldTaskSalvation() {
         const battles = await this.mapRepo.find({
@@ -62,5 +43,12 @@ export class AutoTasksService {
                 this.mapRepo.delete(battles[l].id)
             }
         }
+    }
+
+    async spawnMine() {
+        //получить список чанков
+        //зайти в каждый чанк
+        //заспавнить там по n шахт
+
     }
 }

@@ -37,4 +37,7 @@ export class Building {
 
     @Column()
     isBattle: boolean
+
+    @Column({ nullable: true })
+    balance: number
 }
